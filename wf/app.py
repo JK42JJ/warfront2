@@ -49,6 +49,13 @@ class WarfrontApp(App):
     #editor { height: 18; border: tall $primary; }
     #grade-panel { height: auto; border: tall $accent; padding: 1 2; margin-top: 1; }
 
+    /* ---- 인식 드릴 ---- */
+    #drill { padding: 2 6; height: auto; }
+    #drill-progress { height: auto; margin-bottom: 1; }
+    #drill-question { height: auto; border: tall $primary; padding: 1 2; margin-bottom: 1; }
+    #drill-choices { height: auto; margin-bottom: 1; }
+    #drill-feedback { height: auto; border: tall $warning; padding: 1 2; }
+
     /* ---- 결과 ---- */
     #result { padding: 1 4; height: auto; }
     #result-title { text-align: center; width: 100%; height: auto; margin-bottom: 1; }

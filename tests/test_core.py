@@ -525,3 +525,36 @@ def test_recognition_bank_sourced():
     assert ("bfs", "dijkstra") in pairs      # 가중치 유무 경계
     assert ("greedy", "dp") in pairs          # 교환논증 성립 경계
     assert ("dfs", "bfs") in pairs            # 최단 필요 여부 경계
+
+
+@pytest.mark.asyncio
+async def test_recognition_drill_flow(tmp_path, monkeypatch):
+    """인식 드릴: i → 지문 → 번호 선택 → 판정 기록 → 피드백 → 요약 → 인식률 반영."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.drill import RecognitionScreen
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        await pilot.press("i")
+        await pilot.pause()
+        screen = app.screen
+        assert isinstance(screen, RecognitionScreen)
+        screen.items = screen.items[:2]        # 2문항 세션으로 축소
+        screen._show_question()
+        # 1번째: 정답 선택
+        item = screen.items[0]
+        idx = screen.current_choices.index(item["answer"]) + 1
+        await pilot.press(str(idx))
+        assert screen.phase == "feedback"
+        await pilot.press("space")             # 다음
+        # 2번째: 오답(정답·also 아닌 것) 선택
+        item = screen.items[1]
+        wrong = next(c for c in screen.current_choices
+                     if c != item["answer"] and c not in item["also_ok"])
+        await pilot.press(str(screen.current_choices.index(wrong) + 1))
+        await pilot.press("space")             # 요약으로
+        assert screen.phase == "summary"
+        conn = db.connect()
+        stats = db.recognition_stats(conn)
+        conn.close()
+        assert stats["total"] == 2 and stats["correct"] == 1 and stats["rate"] == 50

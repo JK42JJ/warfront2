@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS bests (
 CREATE TABLE IF NOT EXISTS meta (
     key TEXT PRIMARY KEY, value TEXT
 );
+CREATE TABLE IF NOT EXISTS recognition (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    day TEXT NOT NULL,
+    item_id TEXT NOT NULL,
+    answer TEXT NOT NULL,           -- 정답 유형
+    chosen TEXT NOT NULL,           -- 선택 유형
+    correct INTEGER NOT NULL,
+    created_at TEXT DEFAULT (datetime('now','localtime'))
+);
 """
 
 MODES = ("guided", "cloze", "recall", "solve")  # 보고 → 빈칸 → 재현 → 구현
@@ -167,3 +176,24 @@ def sprint_toggle(conn: sqlite3.Connection) -> bool:
     conn.execute("DELETE FROM meta WHERE key='sprint_start'")
     conn.commit()
     return False
+
+
+def record_recognition(conn: sqlite3.Connection, item_id: str,
+                       answer: str, chosen: str, correct: bool) -> None:
+    conn.execute(
+        "INSERT INTO recognition (day, item_id, answer, chosen, correct) VALUES (?,?,?,?,?)",
+        (date.today().isoformat(), item_id, answer, chosen, int(correct)))
+    conn.commit()
+
+
+def recognition_stats(conn: sqlite3.Connection) -> dict:
+    """유형 인식률 — 전체·유형별 (식별력 지표)."""
+    total, correct = conn.execute(
+        "SELECT COUNT(*), COALESCE(SUM(correct),0) FROM recognition").fetchone()
+    by_type = {}
+    for ans, n, c in conn.execute(
+            "SELECT answer, COUNT(*), SUM(correct) FROM recognition GROUP BY answer"):
+        by_type[ans] = {"n": n, "correct": c, "rate": round(100 * c / n)}
+    return {"total": total, "correct": correct,
+            "rate": round(100 * correct / total) if total else None,
+            "by_type": by_type}

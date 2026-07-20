@@ -23,6 +23,7 @@ class HomeScreen(Screen):
         ("b", "open_mode('cloze')", "빈칸"),
         ("r", "open_mode('recall')", "재현"),
         ("s", "open_mode('solve')", "구현"),
+        ("i", "drill", "인식 드릴"),
         ("t", "toggle_sprint", "속성 7일"),
         ("q", "quit_app", "종료"),
     ]
@@ -35,6 +36,7 @@ class HomeScreen(Screen):
         streak = db.get_streak(conn)
         self._progress = {k.id: db.kata_progress(conn, k.id) for k in load_katas()}
         sprint = db.sprint_state(conn)
+        self._recog = db.recognition_stats(conn)
         conn.close()
         self._sprint_plan = _json.loads(
             (_Path(__file__).parent.parent / "content/sprint.json").read_text(encoding="utf-8"))
@@ -88,8 +90,15 @@ class HomeScreen(Screen):
                     key=kata.id,
                 )
             yield table
-            yield Static("⏎ 다음 단계 자동  ·  g 보고 / b 빈칸 / r 재현 / s 구현 (언제든 재수련)  ·  훈련 중 F1 힌트  ·  q 종료",
-                         id="dash-help")
+            help_text = Text()
+            help_text.append("⏎ 다음 단계 자동 · g/b/r/s 모드 · i 인식 드릴 · t 속성 7일 · q 종료\n", style="dim")
+            if self._recog["rate"] is not None:
+                style = "green" if self._recog["rate"] >= 90 else "yellow"
+                help_text.append(f"유형 인식률 {self._recog['rate']}% (n={self._recog['total']}) — 목표 90%+",
+                                 style=style)
+            else:
+                help_text.append("유형 인식률 미측정 — i 로 첫 드릴 (지문만 보고 유형 판별)", style="yellow")
+            yield Static(help_text, id="dash-help")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -116,6 +125,10 @@ class HomeScreen(Screen):
             return
         row_key, _ = table.coordinate_to_cell_key(table.cursor_coordinate)
         self._open(row_key.value, mode)
+
+    def action_drill(self) -> None:
+        from wf.screens.drill import RecognitionScreen
+        self.app.push_screen(RecognitionScreen())
 
     def action_toggle_sprint(self) -> None:
         conn = db.connect()
