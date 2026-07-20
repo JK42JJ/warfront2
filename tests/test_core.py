@@ -558,3 +558,39 @@ async def test_recognition_drill_flow(tmp_path, monkeypatch):
         stats = db.recognition_stats(conn)
         conn.close()
         assert stats["total"] == 2 and stats["correct"] == 1 and stats["rate"] == 50
+
+
+# ---------- 공백 유연화 (2026-07-20 James: 띄어쓰기까지 동일할 필요 없다) ----------
+def test_optional_space_skip():
+    """'dr, dc'를 'dr,dc'로 쳐도 오타 없이 통과."""
+    s = TypingSession(target="dr, dc")
+    for ch in "dr,dc":
+        assert s.feed(ch) in ("ok", "done")
+    assert s.done and s.errors == 0
+
+
+def test_extra_space_ignored():
+    """'x=1'을 'x = 1'로 쳐도 오타 아님 (여분 공백 무시)."""
+    s = TypingSession(target="x=1")
+    results = [s.feed(ch) for ch in "x = 1"]
+    assert s.done and s.errors == 0
+    assert results.count("noop") == 2          # 여분 공백 2회는 무시
+
+
+def test_string_space_strict():
+    """문자열 안 공백은 의미 있음 — 생략하면 오타."""
+    s = TypingSession(target='a = "b c"')
+    for ch in 'a="b':
+        s.feed(ch)
+    assert s.feed("c") == "err"                # "b c"의 공백 생략 = 오타
+    assert s.feed(" ") == "ok"
+    assert s.feed("c") == "ok"
+
+
+def test_indent_still_auto():
+    """들여쓰기는 기존대로 자동 스킵 (유연화와 무관)."""
+    s = TypingSession(target="if x:\n    return 1")
+    for ch in "if x:":
+        s.feed(ch)
+    s.feed("\n")
+    assert s.target[s.pos] == "r"              # 4칸 들여쓰기 자동 통과

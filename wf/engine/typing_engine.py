@@ -7,6 +7,10 @@
 - 대상 문자와 일치하는 키만 pos 전진. 불일치 = error 카운트(전진 안 함).
 - 줄바꿈은 Enter로 침. 줄바꿈 통과 시 다음 줄 들여쓰기(선행 공백)는 자동 스킵
   (들여쓰기 타이핑은 훈련 가치가 없고 흐름만 깬다).
+- 공백 유연화(2026-07-20, James): 문법이 아닌 띄어쓰기까지 동일할 필요는 없다.
+  · 대상의 '선택적 공백'(줄 중간, 문자열 밖)은 다음 글자를 바로 쳐도 자동 통과
+  · 대상에 없는 자리에서 공백을 쳐도 오타로 세지 않음(무시)
+  · 단, 문자열 리터럴 안의 공백은 의미가 있으므로 엄격 일치
 - WPM = (진행 문자수/5) / 경과분. 정확도 = 정타 / 총 키입력.
 """
 from __future__ import annotations
@@ -64,6 +68,33 @@ class TypingSession:
             return 100.0
         return max(0.0, 100.0 * (self.keystrokes - self.errors) / self.keystrokes)
 
+    # ---- 공백 유연화 도우미 ----
+    def _in_string(self, i: int) -> bool:
+        """위치 i가 문자열 리터럴 안인가 — 현재 줄의 따옴표 짝으로 판정."""
+        line_start = self.target.rfind("\n", 0, i) + 1
+        sq = dq = 0
+        j = line_start
+        while j < i:
+            ch = self.target[j]
+            if ch == "\\":
+                j += 2
+                continue
+            if ch == "'" and dq % 2 == 0:
+                sq += 1
+            elif ch == '"' and sq % 2 == 0:
+                dq += 1
+            j += 1
+        return sq % 2 == 1 or dq % 2 == 1
+
+    def _optional_space(self, i: int) -> bool:
+        """대상 위치 i의 공백이 '스타일 공백'인가 (줄 중간 + 문자열 밖)."""
+        if self.target[i] != " ":
+            return False
+        line_start = self.target.rfind("\n", 0, i) + 1
+        if set(self.target[line_start:i]) <= {" ", "\t"}:
+            return False          # 들여쓰기(선행 공백)는 별도 자동 스킵 대상
+        return not self._in_string(i)
+
     # ---- 입력 처리 ----
     def feed(self, char: str) -> str:
         """한 키 입력 판정. 반환: 'ok' | 'err' | 'done' | 'noop'."""
@@ -71,6 +102,23 @@ class TypingSession:
             return "noop"
         if self.started_at is None:
             self.started_at = time.monotonic()
+
+        expected = self.target[self.pos]
+
+        # 여분 공백: 대상에 없는 자리의 스페이스는 무시 (오타 아님, 카운트 없음)
+        if char == " " and expected not in (" ",) and not self._in_string(self.pos):
+            return "noop"
+
+        # 선택적 공백 건너뛰기: 다음 실제 글자를 바로 친 경우
+        if char != " " and self._optional_space(self.pos):
+            skip = self.pos
+            while skip < len(self.target) and self.target[skip] == " " and self._optional_space(skip):
+                skip += 1
+            if skip < len(self.target) and (
+                self.target[skip] == char
+                or (self.target[skip] == "\n" and char in ("\n", "\r"))
+            ):
+                self.pos = skip   # 공백들 통과 후 아래 정상 판정으로
 
         expected = self.target[self.pos]
         self.keystrokes += 1
