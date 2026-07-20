@@ -1,0 +1,14 @@
+{
+  "id": "topk-counter",
+  "type": "hash",
+  "title": "해시 — 빈도 집계 Top-K",
+  "belt": "해시",
+  "think_prompt": "빈도 상위 K개를 뽑을 때 전체 정렬 대신 무엇을 쓰면 O(n log k)가 되나? 동률 처리(tie-break)는? (한 줄 선언 후 Enter)",
+  "think_model": "Counter로 O(n) 집계 후 heapq.nsmallest(k, key=(-빈도, 이름)) — 힙 크기를 k로 유지해 O(n log k). 동률은 key 튜플 2번째 요소(사전순)로.",
+  "code": "from collections import Counter\nimport heapq\n\ndef top_k(words, k):\n    c = Counter(words)\n    return heapq.nsmallest(k, c.items(), key=lambda x: (-x[1], x[0]))\n",
+  "resources": [
+    {"name": "백준 1927 최소 힙 (실버2)", "url": "https://www.acmicpc.net/problem/1927"},
+    {"name": "백준 20291 파일 정리 (실버3)", "url": "https://www.acmicpc.net/problem/20291"},
+    {"name": "HackerRank — Word Order (dict 빈도)", "url": "https://www.hackerrank.com/challenges/word-order/problem"}
+  ]
+}

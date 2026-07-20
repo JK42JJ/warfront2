@@ -1,0 +1,14 @@
+{
+  "id": "bfs-grid",
+  "type": "bfs",
+  "title": "BFS — 격자 최단거리",
+  "belt": "탐색",
+  "think_prompt": "BFS가 '최단거리'를 보장하는 이유는? 핵심 자료구조는? (한 줄로 선언 후 Enter — 또는 ✏️ 연필로 격자에 파도가 퍼지는 그림을 먼저 그려보세요)",
+  "think_model": "큐(FIFO). 같은 거리의 층을 전부 소진한 뒤 다음 층으로 가므로, 목표에 처음 닿는 순간이 곧 최단거리다.",
+  "code": "from collections import deque\n\ndef bfs(grid, start, goal):\n    n, m = len(grid), len(grid[0])\n    q = deque([(start, 0)])\n    seen = {start}\n    while q:\n        (r, c), d = q.popleft()\n        if (r, c) == goal:\n            return d\n        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < m:\n                if grid[nr][nc] == 0 and (nr, nc) not in seen:\n                    seen.add((nr, nc))\n                    q.append(((nr, nc), d + 1))\n    return -1\n",
+  "resources": [
+    {"name": "백준 2178 미로 탐색 (실버1)", "url": "https://www.acmicpc.net/problem/2178"},
+    {"name": "백준 1926 그림 (실버1)", "url": "https://www.acmicpc.net/problem/1926"},
+    {"name": "HackerRank — BFS: Shortest Reach", "url": "https://www.hackerrank.com/challenges/bfsshortreach/problem"}
+  ]
+}
