@@ -126,3 +126,42 @@ async def test_result_screen_renders_with_urls(tmp_path, monkeypatch):
         # Result 화면이 크래시 없이 마운트·렌더됐는가 (URL 포함 resources 위젯 존재)
         assert isinstance(app.screen, ResultScreen)
         assert app.screen.query_one("#resources") is not None
+
+
+@pytest.mark.asyncio
+async def test_layout_widgets_visible_in_viewport(tmp_path, monkeypatch):
+    """회귀: 2026-07-20 화면깨짐 — 컨테이너 1fr 확장으로 라벨·비교·링크가
+    화면 밖으로 밀림. 핵심 위젯 전부가 뷰포트(120x50) 안에 있어야 한다."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.kata import KataScreen
+
+    W, H = 120, 50
+    app = WarfrontApp()
+    async with app.run_test(size=(W, H)) as pilot:
+        await pilot.press("enter")
+        await pilot.pause()
+        screen = app.screen
+        assert isinstance(screen, KataScreen)
+        # THINK 박스가 화면을 다 먹지 않아야 (auto 높이)
+        think_box = screen.query_one("#think-box")
+        assert 0 < think_box.region.height <= 12, f"think-box height={think_box.region.height}"
+        # THINK 통과 → 타이핑 완주 → 결과
+        for ch in "큐로 층별 확장":
+            await pilot.press(ch if ch != " " else "space")
+        await pilot.press("enter")
+        await pilot.pause()
+        target = screen.session.target
+        for c in target[:-1]:
+            screen.session.feed(c)
+        await pilot.press("enter" if target[-1] == "\n" else target[-1])
+        await pilot.pause()
+        # 결과 화면: 라벨 3개·비교·링크·메뉴 전부 뷰포트 안 + 높이>0
+        res = app.screen
+        labels = res.query(".stat-label")
+        assert len(labels) == 3
+        for w in [*labels, res.query_one("#think-compare"),
+                  res.query_one("#resources"), res.query_one("#result-menu")]:
+            r = w.region
+            assert r.height > 0, f"{w.id or w.classes} 높이 0 (숨겨짐)"
+            assert r.y + r.height <= H, f"{w.id or w.classes} 화면 밖 (y={r.y}, h={r.height})"

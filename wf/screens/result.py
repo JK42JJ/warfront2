@@ -45,13 +45,13 @@ class ResultScreen(Screen):
             with Horizontal(id="result-stats"):
                 with Vertical(classes="stat-block"):
                     yield Digits(str(int(s["wpm"])), classes="big-stat")
-                    yield Static("WPM", classes="stat-label")
+                    yield Static("타속 WPM", classes="stat-label")
                 with Vertical(classes="stat-block"):
                     yield Digits(str(int(s["accuracy"])), classes="big-stat")
                     yield Static("정확도 %", classes="stat-label")
                 with Vertical(classes="stat-block"):
                     yield Digits(str(int(s["elapsed"])), classes="big-stat")
-                    yield Static("초", classes="stat-label")
+                    yield Static("걸린 시간(초)", classes="stat-label")
 
             # Think-First 피드백: 내 선언 vs 모범 접근 (Text로 안전 구성)
             compare = Text()

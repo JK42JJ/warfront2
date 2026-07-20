@@ -54,9 +54,9 @@ class KataScreen(Screen):
                 yield Static(id="code-display")
                 with Horizontal(id="stats"):
                     yield Digits("0", id="wpm-digits")
-                    yield Static("WPM", classes="stat-label")
+                    yield Static("타속 WPM", classes="stat-label")
                     yield Digits("100", id="acc-digits")
-                    yield Static("ACC%", classes="stat-label")
+                    yield Static("정확도 %", classes="stat-label")
         yield Footer()
 
     def on_mount(self) -> None:
