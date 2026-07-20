@@ -23,21 +23,43 @@ class HomeScreen(Screen):
         ("b", "open_mode('cloze')", "빈칸"),
         ("r", "open_mode('recall')", "재현"),
         ("s", "open_mode('solve')", "구현"),
+        ("t", "toggle_sprint", "속성 7일"),
         ("q", "quit_app", "종료"),
     ]
 
     def compose(self) -> ComposeResult:
+        import json as _json
+        from pathlib import Path as _Path
         conn = db.connect()
         day = db.course_day(conn)
         streak = db.get_streak(conn)
         self._progress = {k.id: db.kata_progress(conn, k.id) for k in load_katas()}
+        sprint = db.sprint_state(conn)
         conn.close()
+        self._sprint_plan = _json.loads(
+            (_Path(__file__).parent.parent / "content/sprint.json").read_text(encoding="utf-8"))
+        self._sprint = sprint
+        sprint_katas = []
+        if sprint:
+            d = str(min(sprint["day"], 7))
+            sprint_katas = self._sprint_plan["plan"][d]["katas"]
 
         with Vertical(id="dash"):
             head = Text()
             head.append("⚔ WARFRONT 2", style="bold cyan")
             head.append("   50일 코딩테스트 훈련", style="dim")
             yield Static(head, id="dash-head")
+            if self._sprint:
+                sd = self._sprint["day"]
+                sp = Text()
+                if sd <= 7:
+                    d = str(sd)
+                    sp.append(f"⚡ 속성 모드 D{sd}/7", style="bold yellow")
+                    sp.append(f" — 오늘: {self._sprint_plan['plan'][d]['focus']}", style="yellow")
+                    sp.append("   (t로 해제)", style="dim")
+                else:
+                    sp.append("⚡ 속성 7일 완료 — 실전 응시 단계. t로 해제", style="bold yellow")
+                yield Static(sp, id="sprint-banner")
             with Horizontal(id="dash-top"):
                 with Vertical(classes="dash-metric"):
                     yield Digits(f"{day}", id="day-digits")
@@ -50,8 +72,9 @@ class HomeScreen(Screen):
             for kata in load_katas():
                 p = self._progress[kata.id]
                 c = p["counts"]
+                marker = "⚡ " if (self._sprint and kata.id in sprint_katas) else ""
                 table.add_row(
-                    kata.title, kata.desc or kata.belt,
+                    marker + kata.title, kata.desc or kata.belt,
                     str(c["guided"]), str(c["cloze"]), str(c["recall"]),
                     ("✅" if c["solve"] else "—"),
                     MODE_KO[p["next_mode"]],
@@ -86,6 +109,13 @@ class HomeScreen(Screen):
             return
         row_key, _ = table.coordinate_to_cell_key(table.cursor_coordinate)
         self._open(row_key.value, mode)
+
+    def action_toggle_sprint(self) -> None:
+        conn = db.connect()
+        on = db.sprint_toggle(conn)
+        conn.close()
+        self.notify("⚡ 속성 7일 시작 — 오늘 카타에 ⚡ 표시" if on else "속성 모드 해제 — 50일 일정으로 복귀")
+        self.app.switch_screen(HomeScreen())
 
     def action_quit_app(self) -> None:
         self.app.exit()

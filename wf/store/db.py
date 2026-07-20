@@ -146,3 +146,24 @@ def import_sessions(conn: sqlite3.Connection, rows: list[dict]) -> int:
                  (first_day,))
     conn.commit()
     return len(rows)
+
+
+def sprint_state(conn: sqlite3.Connection) -> dict | None:
+    """속성 모드 상태 — {'day': n, 'start': date} 또는 None."""
+    row = conn.execute("SELECT value FROM meta WHERE key='sprint_start'").fetchone()
+    if row is None:
+        return None
+    start = date.fromisoformat(row[0])
+    return {"day": (date.today() - start).days + 1, "start": row[0]}
+
+
+def sprint_toggle(conn: sqlite3.Connection) -> bool:
+    """속성 모드 켜기/끄기. 반환: 켜졌는지."""
+    if sprint_state(conn) is None:
+        conn.execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('sprint_start', ?)",
+                     (date.today().isoformat(),))
+        conn.commit()
+        return True
+    conn.execute("DELETE FROM meta WHERE key='sprint_start'")
+    conn.commit()
+    return False

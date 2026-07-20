@@ -1,0 +1,13 @@
+{
+  "days": 7,
+  "note": "갑자기 코테가 잡혔을 때 — 하루 60~90분, 최빈출 유형만 압축. 하루 안에 보고→빈칸→재현까지 밀어붙인다.",
+  "plan": {
+    "1": {"katas": ["py-parse", "sim-robot"], "focus": "어법 + 구현 (최빈출 1위)"},
+    "2": {"katas": ["topk-counter", "greedy-meetings"], "focus": "해시 + 그리디"},
+    "3": {"katas": ["stack-brackets", "heap-merge"], "focus": "스택 + 힙"},
+    "4": {"katas": ["bfs-grid", "dfs-islands"], "focus": "탐색 집중 (BFS·DFS — 최중요)"},
+    "5": {"katas": ["backtrack-subset", "string-compress"], "focus": "완전탐색 + 구현 심화"},
+    "6": {"katas": ["dp-kadane", "binary-cut"], "focus": "DP + 이분탐색"},
+    "7": {"katas": [], "focus": "최종 리허설 — 전 유형 재현(r) 랜덤 3개 + 실전 링크 1문제 직접 제출"}
+  }
+}

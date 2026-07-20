@@ -15,6 +15,7 @@ class WarfrontApp(App):
     /* ---- 대시보드(홈) ---- */
     #dash { padding: 1 3; height: auto; width: 100%; }
     #dash-head { height: auto; margin-bottom: 1; }
+    #sprint-banner { height: auto; margin-bottom: 1; }
     #dash-top { height: auto; align-horizontal: center; margin-bottom: 1; }
     .dash-metric { width: auto; height: auto; margin: 0 4; }
     .dash-metric Digits { width: auto; color: $warning; }

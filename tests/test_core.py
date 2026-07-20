@@ -458,3 +458,22 @@ def test_records_backup_and_restore(tmp_path, monkeypatch):
     assert p["next_mode"] == "recall"          # 단계 진행 이어짐
     assert dbmod.get_streak(conn) == 1         # 오늘 세션 복원 → 연속일 유지
     conn.close()
+
+
+@pytest.mark.asyncio
+async def test_sprint_mode(tmp_path, monkeypatch):
+    """속성 7일: t 토글 → 배너 + 오늘 카타 ⚡ 표시, 재토글 → 해제."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        assert not app.screen.query("#sprint-banner")
+        await pilot.press("t")
+        await pilot.pause()
+        assert app.screen.query_one("#sprint-banner") is not None
+        conn = db.connect()
+        assert db.sprint_state(conn)["day"] == 1
+        conn.close()
+        await pilot.press("t")
+        await pilot.pause()
+        assert not app.screen.query("#sprint-banner")

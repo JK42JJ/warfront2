@@ -104,5 +104,26 @@ def reset(yes: bool = typer.Option(False, "--yes", "-y", help="확인 없이 삭
     typer.echo("✅ 초기화 완료 — 다음 `wf` 실행이 Day 1이 됩니다.")
 
 
+@cli.command()
+def sprint(off: bool = typer.Option(False, "--off", help="속성 모드 해제")) -> None:
+    """속성 7일 모드 — 갑자기 코테가 잡혔을 때 최빈출 압축 과정 (하루 60~90분)."""
+    from wf.store import db as dbmod
+    conn = dbmod.connect()
+    if off:
+        if dbmod.sprint_state(conn):
+            dbmod.sprint_toggle(conn)
+            typer.echo("속성 모드 해제 — 50일 일정으로 복귀.")
+        else:
+            typer.echo("속성 모드가 켜져 있지 않습니다.")
+    else:
+        state = dbmod.sprint_state(conn)
+        if state:
+            typer.echo(f"이미 속성 D{state['day']}/7 진행 중. 해제: wf sprint --off")
+        else:
+            dbmod.sprint_toggle(conn)
+            typer.echo("⚡ 속성 7일 시작 — 오늘이 D1. `wf` 대시보드에서 오늘 카타에 ⚡ 표시.")
+    conn.close()
+
+
 def main() -> None:
     cli()
