@@ -109,11 +109,9 @@ wf setup https://github.com/<계정>/my-records.git
 빈 private 저장소 하나면 됩니다. 세션이 끝날 때마다 그날의 기록이
 자동으로 올라가고, 다른 컴퓨터에서 같은 명령을 치면 진도가 복원됩니다.
 
-## 콘텐츠는 어디서 왔나
+## 콘텐츠 출처
 
-문제 유형과 인식 문항은 추측으로 만들지 않았습니다. 프로그래머스 고득점
-Kit 전체, 카카오 공식 해설(2022~2026 공채), 삼성 SW역량테스트 공식 기출
-45문제, HackerRank Interview Preparation Kit 69문제를 원문 확인해
-앵커링했고, 출처 없는 문항은 테스트가 커밋을 막습니다.
-
-정리: [docs/SOURCES.md](docs/SOURCES.md) · 설계 근거: [docs/DESIGN.md](docs/DESIGN.md)
+프로그래머스 고득점 Kit, 카카오 공식 해설(2022~2026 공채), 삼성
+SW역량테스트 공식 기출, HackerRank Interview Preparation Kit 기반입니다.
+문항별 출처는 [docs/SOURCES.md](docs/SOURCES.md)에,
+설계 배경은 [docs/DESIGN.md](docs/DESIGN.md)에 있습니다.
