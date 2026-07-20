@@ -1,0 +1,129 @@
+{
+  "id": "twopointer-pairs",
+  "type": "two_pointer",
+  "title": "투포인터 — 목표합 쌍 개수",
+  "belt": "이분탐색",
+  "desc": "정렬 후 양끝에서 좁혀오기 — O(N²)을 O(N log N)으로(백준 3273 원형).",
+  "expected_complexity": "O(N log N)",
+  "think_prompt": "정렬된 배열에서 양끝 두 포인터의 합이 목표보다 크면/작으면 각각 어느 쪽을 움직여야 하나? 왜 그 이동이 답을 놓치지 않나?",
+  "think_model": "합이 크면 hi를 줄이고(더 작은 합 필요), 작으면 lo를 올린다. 정렬 덕에 각 이동이 '불가능해진 후보'만 버림 — 양끝에서 O(N)에 전 쌍 검사 효과.",
+  "code": "def count_pairs(nums, target):\n    arr = sorted(nums)\n    lo, hi = 0, len(arr) - 1\n    count = 0\n    while lo < hi:\n        s = arr[lo] + arr[hi]\n        if s == target:\n            count += 1\n            lo += 1\n            hi -= 1\n        elif s < target:\n            lo += 1\n        else:\n            hi -= 1\n    return count\n",
+  "subgoals": [
+    {
+      "label": "① 정렬 + 양끝 포인터",
+      "lines": [
+        0,
+        3
+      ]
+    },
+    {
+      "label": "② 합==목표: 카운트 후 양쪽 다 이동",
+      "lines": [
+        4,
+        9
+      ]
+    },
+    {
+      "label": "③ 작으면 lo↑ / 크면 hi↓ — 단조성 이용",
+      "lines": [
+        10,
+        13
+      ]
+    },
+    {
+      "label": "④ 교차하면 종료",
+      "lines": [
+        14,
+        14
+      ]
+    }
+  ],
+  "line_notes": {
+    "1": "투포인터의 전제 = 정렬. 이 한 줄이 O(N²)→O(N log N)",
+    "6": "원소가 유일하다는 조건이므로 쌍 발견 시 양쪽 모두 소진",
+    "11": "★합이 작다 → lo를 키우는 것만이 합을 키운다 (hi를 줄이면 더 작아질 뿐)"
+  },
+  "func": "count_pairs",
+  "tests": [
+    {
+      "args": [
+        [
+          5,
+          12,
+          7,
+          10,
+          9,
+          1,
+          2,
+          3,
+          11
+        ],
+        13
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        [
+          1,
+          2
+        ],
+        3
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        [
+          1,
+          2
+        ],
+        5
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          1,
+          4,
+          2,
+          3
+        ],
+        5
+      ],
+      "expected": 2
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return (list(range(1000000)), 999999)",
+    "time_limit": 3.0
+  },
+  "diagram": {
+    "caption": "정렬 후 양끝에서 — 크면 오른쪽↓, 작으면 왼쪽↑",
+    "fps": 1.0,
+    "frames": [
+      "1 2 3 5 7 9 10 11 12   target=13\n↑lo               hi↑\n1+12=13 ✓ count=1 → 양쪽 이동",
+      "1 2 3 5 7 9 10 11 12\n  ↑lo          hi↑\n2+11=13 ✓ count=2 → 양쪽 이동",
+      "1 2 3 5 7 9 10 11 12\n    ↑lo     hi↑\n3+10=13 ✓ count=3 → 5+9=14 ✗ hi↓ → 5+7=12 ✗ lo↑ → 교차 종료"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 3273 두 수의 합 (실버3 — 원형)",
+      "url": "https://www.acmicpc.net/problem/3273"
+    },
+    {
+      "name": "백준 2470 두 용액 (골드5)",
+      "url": "https://www.acmicpc.net/problem/2470"
+    },
+    {
+      "name": "HackerRank — Pairs (투포인터/해시)",
+      "url": "https://www.hackerrank.com/challenges/pairs/problem"
+    },
+    {
+      "name": "HackerRank — Triple Sum",
+      "url": "https://www.hackerrank.com/challenges/triple-sum/problem"
+    }
+  ]
+}

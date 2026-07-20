@@ -177,8 +177,8 @@ class SolveScreen(Screen):
 
     def _sync_career(self) -> None:
         from wf import sync
-        msg = sync.export_and_push()
-        if msg.startswith("동기화 완료"):
+        msg = sync.sync_all()
+        if "동기화 완료" in msg or "push 완료" in msg:
             self.app.call_from_thread(
                 self.notify, f"📊 일일 루틴 반영 — {msg}", timeout=4)
 

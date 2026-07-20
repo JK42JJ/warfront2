@@ -1,0 +1,117 @@
+{
+  "id": "stack-brackets",
+  "type": "stack",
+  "title": "스택 — 괄호 유효성",
+  "belt": "스택큐",
+  "desc": "여러 종류 괄호의 짝 검사. 스택의 존재 이유를 몸에 새기는 원형.",
+  "expected_complexity": "O(N)",
+  "think_prompt": "왜 이 문제는 스택인가? '가장 최근에 열린 것이 가장 먼저 닫혀야 한다'를 자료구조로 말하면?",
+  "think_model": "LIFO. 여는 괄호는 push, 닫는 괄호는 pop해서 짝 확인. '최근 열림 ↔ 최선 닫힘' 대응이 스택 그 자체. 끝났을 때 스택이 비어야 완전 매칭.",
+  "code": "def is_valid(s):\n    pairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\n    stack = []\n    for ch in s:\n        if ch in \"([{\":\n            stack.append(ch)\n        elif ch in pairs:\n            if not stack or stack.pop() != pairs[ch]:\n                return False\n    return not stack\n",
+  "subgoals": [
+    {
+      "label": "① 짝 대응표 + 빈 스택 준비",
+      "lines": [
+        0,
+        2
+      ]
+    },
+    {
+      "label": "② 여는 괄호 → push",
+      "lines": [
+        3,
+        5
+      ]
+    },
+    {
+      "label": "③ 닫는 괄호 → pop해서 짝 검사 (빈 스택·짝 불일치 = 실패)",
+      "lines": [
+        6,
+        8
+      ]
+    },
+    {
+      "label": "④ 순회 후 스택이 비어야 성공",
+      "lines": [
+        9,
+        9
+      ]
+    }
+  ],
+  "line_notes": {
+    "1": "닫는→여는 대응표. 검사 시 O(1) 조회",
+    "5": "여는 건 무조건 쌓는다 — 판단은 닫힐 때",
+    "7": "★두 실패 모드: 닫는데 열린 게 없음(not stack) / 짝이 다름(pop 불일치)",
+    "9": "★return not stack — '(' 만 남은 미완성 케이스를 잡는 마지막 관문"
+  },
+  "func": "is_valid",
+  "tests": [
+    {
+      "args": [
+        "([]{})"
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        "([)]"
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        "((("
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        ")"
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        ""
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        "{[()()]}"
+      ],
+      "expected": true
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ('(' * 500000 + ')' * 500000,)",
+    "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "스택 = 최근에 연 것이 먼저 닫힌다(LIFO)",
+    "fps": 1.0,
+    "frames": [
+      "입력: [ ( ] . . .\n      ▲\n스택: [           ← '[' push",
+      "입력: [ ( ] . . .\n        ▲\n스택: [ (         ← '(' push",
+      "입력: [ ( ] . . .\n          ▲\n스택: [ (  ✗      ← ']' 닫는데 top이 '(' — 짝 불일치 = False"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 9012 괄호 (실버4)",
+      "url": "https://www.acmicpc.net/problem/9012"
+    },
+    {
+      "name": "HackerRank — Balanced Brackets",
+      "url": "https://www.hackerrank.com/challenges/balanced-brackets/problem"
+    },
+    {
+      "name": "HackerRank — Simple Text Editor (스택 undo)",
+      "url": "https://www.hackerrank.com/challenges/simple-text-editor/problem"
+    },
+    {
+      "name": "백준 4949 균형잡힌 세상 (실버4)",
+      "url": "https://www.acmicpc.net/problem/4949"
+    }
+  ]
+}

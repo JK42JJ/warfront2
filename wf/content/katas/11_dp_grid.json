@@ -1,0 +1,138 @@
+{
+  "id": "dp-grid",
+  "type": "dp",
+  "title": "DP — 격자 최소 경로합",
+  "belt": "DP",
+  "desc": "우/하로만 이동, 좌상→우하 최소 비용. 2차원 DP 테이블의 원형.",
+  "expected_complexity": "O(N·M)",
+  "think_prompt": "칸 (i,j)에 도달하는 경로는 어디서만 올 수 있나? 그러면 dp[i][j] 점화식은? 첫 행/첫 열이 왜 특별한가?",
+  "think_model": "위(i-1,j) 또는 왼쪽(i,j-1)에서만 옴 → dp[i][j] = min(위, 왼쪽) + 비용. 첫 행/열은 한 방향뿐이라 누적합. 답은 dp[-1][-1].",
+  "code": "def min_path_sum(grid):\n    n, m = len(grid), len(grid[0])\n    dp = [[0] * m for _ in range(n)]\n    for i in range(n):\n        for j in range(m):\n            if i == 0 and j == 0:\n                dp[i][j] = grid[0][0]\n            elif i == 0:\n                dp[i][j] = dp[i][j-1] + grid[i][j]\n            elif j == 0:\n                dp[i][j] = dp[i-1][j] + grid[i][j]\n            else:\n                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]\n    return dp[-1][-1]\n",
+  "subgoals": [
+    {
+      "label": "① dp 테이블 생성 (같은 크기, 0)",
+      "lines": [
+        0,
+        2
+      ]
+    },
+    {
+      "label": "② 경계: 시작칸·첫 행·첫 열은 한 방향 누적",
+      "lines": [
+        3,
+        10
+      ]
+    },
+    {
+      "label": "③ 점화식: min(위, 왼쪽) + 현재 비용",
+      "lines": [
+        11,
+        12
+      ]
+    },
+    {
+      "label": "④ 우하단이 답",
+      "lines": [
+        13,
+        13
+      ]
+    }
+  ],
+  "line_notes": {
+    "2": "★[[0]*m for _ in range(n)] — [[0]*m]*n 은 같은 행 참조 복사 함정!",
+    "8": "첫 행: 왼쪽에서만 올 수 있음",
+    "12": "점화식 — '어디서 왔는가'를 min으로 요약",
+    "13": "dp[-1][-1] = 우하단 도달 최소 비용"
+  },
+  "func": "min_path_sum",
+  "tests": [
+    {
+      "args": [
+        [
+          [
+            1,
+            3,
+            1
+          ],
+          [
+            1,
+            5,
+            1
+          ],
+          [
+            4,
+            2,
+            1
+          ]
+        ]
+      ],
+      "expected": 7
+    },
+    {
+      "args": [
+        [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ]
+        ]
+      ],
+      "expected": 7
+    },
+    {
+      "args": [
+        [
+          [
+            5
+          ]
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          [
+            1,
+            2,
+            3
+          ]
+        ]
+      ],
+      "expected": 6
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 700\n    return ([[(i + j) % 10 for j in range(n)] for i in range(n)],)",
+    "time_limit": 3.0
+  },
+  "diagram": {
+    "caption": "각 칸 = min(위, 왼쪽) + 비용 — 작은 문제의 답을 쌓아 큰 답",
+    "fps": 0,
+    "frames": [
+      "grid          dp\n1 3 1         1  4  5\n1 5 1    →    2  7  6\n4 2 1         6  8  7 ← 답\n\ndp[2][2] = min(dp[1][2]=6, dp[2][1]=8) + 1 = 7"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 1149 RGB거리 (실버1 — 2차원 DP)",
+      "url": "https://www.acmicpc.net/problem/1149"
+    },
+    {
+      "name": "백준 11048 이동하기 (실버2 — 격자 DP 원형)",
+      "url": "https://www.acmicpc.net/problem/11048"
+    },
+    {
+      "name": "HackerRank — Candies (DP)",
+      "url": "https://www.hackerrank.com/challenges/candies/problem"
+    },
+    {
+      "name": "HackerRank — The Coin Change Problem",
+      "url": "https://www.hackerrank.com/challenges/coin-change/problem"
+    }
+  ]
+}

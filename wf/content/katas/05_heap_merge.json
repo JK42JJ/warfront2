@@ -1,0 +1,108 @@
+{
+  "id": "heap-merge",
+  "type": "heap",
+  "title": "힙 — 최소 비용 합치기",
+  "belt": "스택큐",
+  "desc": "매번 가장 작은 둘을 합칠 때 총비용 최소화(백준 1715 원형).",
+  "expected_complexity": "O(N log N)",
+  "think_prompt": "왜 '항상 가장 작은 두 개'를 먼저 합쳐야 총비용이 최소인가? 그걸 매번 O(log N)에 꺼내주는 자료구조는?",
+  "think_model": "일찍 합친 묶음은 이후 합칠 때마다 비용에 반복 포함 → 작은 것부터 합쳐야 반복 비용이 작다. 최소 힙(heapq)이 '현재 최소 2개'를 O(log N)에 제공.",
+  "code": "import heapq\n\ndef min_merge_cost(cards):\n    heap = list(cards)\n    heapq.heapify(heap)\n    total = 0\n    while len(heap) > 1:\n        a = heapq.heappop(heap)\n        b = heapq.heappop(heap)\n        total += a + b\n        heapq.heappush(heap, a + b)\n    return total\n",
+  "subgoals": [
+    {
+      "label": "① 리스트를 힙으로 (heapify O(N))",
+      "lines": [
+        0,
+        5
+      ]
+    },
+    {
+      "label": "② 최소 2개 pop → 합쳐서 비용 누적 → 다시 push",
+      "lines": [
+        6,
+        10
+      ]
+    },
+    {
+      "label": "③ 하나 남으면 총비용 반환",
+      "lines": [
+        11,
+        11
+      ]
+    }
+  ],
+  "line_notes": {
+    "4": "heapify — 정렬(N log N)보다 싼 O(N) 힙 구성",
+    "7": "heappop = 최솟값 O(log N)",
+    "10": "★합친 묶음을 다시 넣는다 — 다음 라운드의 후보"
+  },
+  "func": "min_merge_cost",
+  "tests": [
+    {
+      "args": [
+        [
+          10,
+          20,
+          40
+        ]
+      ],
+      "expected": 100
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "expected": 19
+    },
+    {
+      "args": [
+        [
+          7
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        []
+      ],
+      "expected": 0
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ([i % 1000 + 1 for i in range(200000)],)",
+    "time_limit": 3.0
+  },
+  "diagram": {
+    "caption": "작은 것부터 합쳐야 '반복 포함되는 비용'이 최소",
+    "fps": 1.0,
+    "frames": [
+      "힙: [10, 20, 40]\n\npop 10, 20 → 합 30 (비용 30)",
+      "힙: [30, 40]\n\npop 30, 40 → 합 70 (비용 +70)",
+      "힙: [70]\n\n총비용 30+70 = 100 ✅ (큰 걸 먼저 합치면 60+100=160)"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 1715 카드 정렬하기 (골드4 — 원형)",
+      "url": "https://www.acmicpc.net/problem/1715"
+    },
+    {
+      "name": "HackerRank — QHEAP1",
+      "url": "https://www.hackerrank.com/challenges/qheap1/problem"
+    },
+    {
+      "name": "HackerRank — Jesse and Cookies",
+      "url": "https://www.hackerrank.com/challenges/jesse-and-cookies/problem"
+    },
+    {
+      "name": "백준 11279 최대 힙 (실버2)",
+      "url": "https://www.acmicpc.net/problem/11279"
+    }
+  ]
+}

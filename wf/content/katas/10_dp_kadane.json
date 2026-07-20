@@ -1,0 +1,126 @@
+{
+  "id": "dp-kadane",
+  "type": "dp",
+  "title": "DP — 최대 연속 부분합",
+  "belt": "DP",
+  "desc": "연속 구간 합의 최댓값(카데인). 1차원 DP의 대표 원형(백준 1912).",
+  "expected_complexity": "O(N)",
+  "think_prompt": "위치 i에서 끝나는 최대 연속합을 cur라 하면, cur는 무엇과 무엇 중 max인가? (이 한 줄이 DP 점화식이다)",
+  "think_model": "cur = max(x, cur + x) — '이전 구간을 이어붙일지, 여기서 새로 시작할지'. 이전 합이 음수면 버리는 게 이득. 전역 최댓값 best를 함께 갱신.",
+  "code": "def max_subarray(nums):\n    best = cur = nums[0]\n    for x in nums[1:]:\n        cur = max(x, cur + x)\n        best = max(best, cur)\n    return best\n",
+  "subgoals": [
+    {
+      "label": "① 첫 원소로 초기화 (빈 구간 불허)",
+      "lines": [
+        0,
+        1
+      ]
+    },
+    {
+      "label": "② 점화식: 잇기 vs 새출발 — cur = max(x, cur+x)",
+      "lines": [
+        2,
+        3
+      ]
+    },
+    {
+      "label": "③ 전역 최댓값 갱신·반환",
+      "lines": [
+        4,
+        5
+      ]
+    }
+  ],
+  "line_notes": {
+    "1": "모두 음수인 배열도 답이 있어야 하므로 0이 아닌 nums[0]으로 시작",
+    "3": "★점화식 한 줄 = DP의 전부. '과거를 요약한 값(cur)'만 들고 간다",
+    "4": "cur는 'i에서 끝나는' 최대 — 전체 최대는 별도 추적"
+  },
+  "func": "max_subarray",
+  "tests": [
+    {
+      "args": [
+        [
+          10,
+          -4,
+          3,
+          1,
+          5,
+          6,
+          -35,
+          12,
+          21,
+          -1
+        ]
+      ],
+      "expected": 33
+    },
+    {
+      "args": [
+        [
+          -1,
+          -2,
+          -3
+        ]
+      ],
+      "expected": -1
+    },
+    {
+      "args": [
+        [
+          5
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        [
+          2,
+          -1,
+          2
+        ]
+      ],
+      "expected": 3
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ([(i % 7) - 3 for i in range(1000000)],)",
+    "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "cur = max(지금부터 새로, 이전에 잇기) — 음수 짐은 버린다",
+    "fps": 0,
+    "frames": [
+      "x   : 10  -4   3   1   5   6  -35  12  21\ncur : 10   6   9  10  15  21  -14  12  33\nbest: 10  10  10  10  15  21   21  21  33 ← 답\n\n-35에서 cur가 음수로 추락 → 12에서 '새출발'이 이득"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 1912 연속합 (실버2 — 원형)",
+      "url": "https://www.acmicpc.net/problem/1912"
+    },
+    {
+      "name": "HackerRank — The Maximum Subarray",
+      "url": "https://www.hackerrank.com/challenges/maxsubarray/problem"
+    },
+    {
+      "name": "백준 2579 계단 오르기 (실버3 — 1차원 DP 짝)",
+      "url": "https://www.acmicpc.net/problem/2579"
+    },
+    {
+      "name": "HackerRank — Fibonacci Modified",
+      "url": "https://www.hackerrank.com/challenges/fibonacci-modified/problem"
+    }
+  ]
+}

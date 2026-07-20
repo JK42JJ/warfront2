@@ -45,6 +45,35 @@ def today_aggregate(conn) -> dict:
     }
 
 
+def push_records_repo() -> str:
+    """wf setup으로 설정한 개인 기록 repo(~/.warfront2)에 오늘 기록 push."""
+    from wf.store.db import DB_DIR
+    if not (DB_DIR / ".git").exists():
+        return "기록 repo 미설정"
+    conn = db.connect()
+    agg = today_aggregate(conn)
+    conn.close()
+    if not agg:
+        return "오늘 세션 없음"
+    rec_dir = DB_DIR / "records"
+    rec_dir.mkdir(exist_ok=True)
+    (rec_dir / f"{agg['date']}.json").write_text(
+        json.dumps(agg, ensure_ascii=False, indent=1), encoding="utf-8")
+    def git(*a):
+        return subprocess.run(["git", "-C", str(DB_DIR), *a],
+                              capture_output=True, text=True, timeout=30)
+    try:
+        git("add", "records")
+        if git("diff", "--cached", "--quiet").returncode != 0:
+            git("commit", "-q", "-m",
+                f"warfront 기록 {agg['date']} — {agg['sessions']}세션 {agg['total_minutes']}분")
+            push = git("push", "-q", "-u", "origin", "main")
+            return "기록 repo push 완료" if push.returncode == 0 else "기록 커밋됨·push 실패(다음 재시도)"
+        return "변경 없음"
+    except Exception as e:
+        return f"기록 repo 오류 무시: {type(e).__name__}"
+
+
 def export_and_push(repo: Path | None = None) -> str:
     """오늘 집계를 career repo에 기록하고 best-effort push. 반환: 상태 문자열."""
     repo = repo or CAREER_REPO
@@ -86,3 +115,12 @@ def export_and_push(repo: Path | None = None) -> str:
         return "변경 없음"
     except Exception as e:  # 훈련 흐름 방해 금지 — 조용히
         return f"싱크 오류 무시: {type(e).__name__}"
+
+
+def sync_all() -> str:
+    """세션 종료 시 호출 — career repo(James) + 개인 기록 repo(wf setup) 모두 best-effort."""
+    msgs = [export_and_push()]
+    rec = push_records_repo()
+    if rec not in ("기록 repo 미설정",):
+        msgs.append(rec)
+    return " / ".join(msgs)

@@ -1,0 +1,99 @@
+{
+  "id": "py-parse",
+  "type": "basics",
+  "title": "어법 — 파싱과 dict 집계",
+  "belt": "기초",
+  "desc": "문자열 split + dict.get 집계 — 모든 코테 문제의 첫 근육.",
+  "expected_complexity": "O(N)",
+  "think_prompt": "로그 줄에서 두 번째 토큰(레벨)만 뽑아 세려면? split과 dict.get(key, 0)의 조합을 말로 설명해보라.",
+  "think_model": "line.split()[1]로 토큰 추출, counts.get(level, 0) + 1로 '없으면 0부터' 집계 — if key in dict 분기를 없애는 관용구.",
+  "code": "def parse_logs(lines):\n    counts = {}\n    for line in lines:\n        level = line.split()[1]\n        counts[level] = counts.get(level, 0) + 1\n    return counts\n",
+  "subgoals": [
+    {
+      "label": "① 빈 dict 준비",
+      "lines": [
+        0,
+        1
+      ]
+    },
+    {
+      "label": "② 각 줄: split으로 토큰 추출 → get(key,0)+1 집계",
+      "lines": [
+        2,
+        4
+      ]
+    },
+    {
+      "label": "③ 집계표 반환",
+      "lines": [
+        5,
+        5
+      ]
+    }
+  ],
+  "line_notes": {
+    "3": "split() 기본=공백 분리. [1] = 두 번째 토큰",
+    "4": "★get(level, 0) — 키가 없으면 0. 코테 dict 집계의 표준 관용구"
+  },
+  "func": "parse_logs",
+  "tests": [
+    {
+      "args": [
+        [
+          "10:00 ERROR disk",
+          "10:01 INFO ok",
+          "10:02 ERROR net"
+        ]
+      ],
+      "expected": {
+        "ERROR": 2,
+        "INFO": 1
+      }
+    },
+    {
+      "args": [
+        []
+      ],
+      "expected": {}
+    },
+    {
+      "args": [
+        [
+          "a WARN x"
+        ]
+      ],
+      "expected": {
+        "WARN": 1
+      }
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ([f'{i} L{i%5} msg' for i in range(300000)],)",
+    "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "줄 → split → 토큰[1] → dict 집계",
+    "fps": 0,
+    "frames": [
+      "\"10:00 ERROR disk\"\n     │ split()\n     ▼\n[\"10:00\", \"ERROR\", \"disk\"]\n         [1]│\n            ▼\ncounts[\"ERROR\"] = get(\"ERROR\",0) + 1   → {ERROR: 1}"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 10926 ??! (브론즈 — 워밍업)",
+      "url": "https://www.acmicpc.net/problem/10926"
+    },
+    {
+      "name": "HackerRank — Word Order",
+      "url": "https://www.hackerrank.com/challenges/word-order/problem"
+    },
+    {
+      "name": "HackerRank — collections.Counter 연습",
+      "url": "https://www.hackerrank.com/challenges/collections-counter/problem"
+    },
+    {
+      "name": "백준 1157 단어 공부 (브론즈1)",
+      "url": "https://www.acmicpc.net/problem/1157"
+    }
+  ]
+}

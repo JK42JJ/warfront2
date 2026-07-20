@@ -1,0 +1,159 @@
+{
+  "id": "dijkstra",
+  "type": "dijkstra",
+  "title": "다익스트라 — 가중치 최단경로 (선택)",
+  "belt": "탐색",
+  "desc": "간선 비용이 다를 때의 최단경로. BFS+힙 = 다익스트라(카카오 단골).",
+  "expected_complexity": "O(E log V)",
+  "think_prompt": "BFS는 왜 가중치 그래프에서 실패하나? '지금까지 가장 싼 경로'부터 확정하려면 큐 대신 무엇이 필요한가?",
+  "think_model": "BFS의 큐는 '간선 수' 기준 층 확장 — 비용이 다르면 최단 보장 붕괴. 최소 힙으로 '현재 최소 비용 정점'부터 꺼내 확정(그리디). 더 싼 경로 발견 시에만 갱신·push.",
+  "code": "import heapq\n\ndef dijkstra(n, edges, src, dst):\n    graph = [[] for _ in range(n)]\n    for u, v, w in edges:\n        graph[u].append((v, w))\n        graph[v].append((u, w))\n    dist = [float(\"inf\")] * n\n    dist[src] = 0\n    pq = [(0, src)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]:\n            continue\n        if u == dst:\n            return d\n        for v, w in graph[u]:\n            nd = d + w\n            if nd < dist[v]:\n                dist[v] = nd\n                heapq.heappush(pq, (nd, v))\n    return -1\n",
+  "subgoals": [
+    {
+      "label": "① 인접 리스트 구성 (양방향)",
+      "lines": [
+        0,
+        6
+      ]
+    },
+    {
+      "label": "② dist 무한대 초기화 + 시작점 0 + 힙",
+      "lines": [
+        7,
+        9
+      ]
+    },
+    {
+      "label": "③ 최소 비용 정점 pop — 낡은 항목은 스킵(lazy)",
+      "lines": [
+        10,
+        15
+      ]
+    },
+    {
+      "label": "④ 완화(relax): 더 싸지면 갱신 후 push",
+      "lines": [
+        16,
+        20
+      ]
+    },
+    {
+      "label": "⑤ 도달 불가 = -1",
+      "lines": [
+        21,
+        21
+      ]
+    }
+  ],
+  "line_notes": {
+    "9": "힙 원소 (비용, 정점) — 튜플 첫 요소로 정렬되므로 비용이 먼저",
+    "12": "★lazy deletion — 같은 정점이 힙에 여러 번 있어도 낡은(더 비싼) 건 버림",
+    "17": "완화: 새 경로 비용 = 현재까지 + 간선",
+    "18": "더 쌀 때만 갱신 — 이 조건이 없으면 무한 순환"
+  },
+  "func": "dijkstra",
+  "tests": [
+    {
+      "args": [
+        3,
+        [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            2,
+            1,
+            2
+          ]
+        ],
+        0,
+        1
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        2,
+        [],
+        0,
+        1
+      ],
+      "expected": -1
+    },
+    {
+      "args": [
+        1,
+        [],
+        0,
+        0
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        4,
+        [
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            2,
+            1
+          ],
+          [
+            2,
+            3,
+            1
+          ],
+          [
+            0,
+            3,
+            10
+          ]
+        ],
+        0,
+        3
+      ],
+      "expected": 3
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 100000\n    edges = [[i, i + 1, (i % 5) + 1] for i in range(n - 1)]\n    return (n, edges, 0, n - 1)",
+    "time_limit": 3.0
+  },
+  "diagram": {
+    "caption": "BFS의 큐를 최소 힙으로 — '가장 싼 경로'부터 확정",
+    "fps": 0,
+    "frames": [
+      "      4\n  0 ────── 1\n  │       ╱\n 1│     ╱2\n  │   ╱\n  2 ╱\n\n직행 0→1 = 4\n우회 0→2→1 = 1+2 = 3 ✅\n힙이 (3,1)을 (4,1)보다 먼저 꺼내 3으로 확정"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 1753 최단경로 (골드4 — 원형)",
+      "url": "https://www.acmicpc.net/problem/1753"
+    },
+    {
+      "name": "백준 1916 최소비용 구하기 (골드5)",
+      "url": "https://www.acmicpc.net/problem/1916"
+    },
+    {
+      "name": "HackerRank — Dijkstra: Shortest Reach 2",
+      "url": "https://www.hackerrank.com/challenges/dijkstrashortreach/problem"
+    },
+    {
+      "name": "HackerRank — Prim's MST (짝 개념)",
+      "url": "https://www.hackerrank.com/challenges/primsmstsub/problem"
+    }
+  ]
+}

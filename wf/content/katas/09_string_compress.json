@@ -1,0 +1,102 @@
+{
+  "id": "string-compress",
+  "type": "implementation",
+  "title": "구현 — 문자열 런 압축",
+  "belt": "구현",
+  "desc": "연속 문자 묶어 압축(aabcccc→a2bc4). 상태 추적형 문자열 구현.",
+  "expected_complexity": "O(N)",
+  "think_prompt": "순회하며 '연속 구간(run)'을 추적하려면 어떤 상태 변수 2개가 필요한가? 마지막 구간은 왜 따로 처리해야 하나?",
+  "think_model": "상태 = (직전 문자 prev, 연속 길이 run). 문자가 바뀌는 순간 직전 구간을 출력에 확정. 루프가 끝나면 마지막 구간이 미확정으로 남으므로 한 번 더 확정 — off-by-one의 고향.",
+  "code": "def compress(s):\n    if not s:\n        return \"\"\n    out = []\n    prev, run = s[0], 1\n    for ch in s[1:]:\n        if ch == prev:\n            run += 1\n        else:\n            out.append(prev + (str(run) if run > 1 else \"\"))\n            prev, run = ch, 1\n    out.append(prev + (str(run) if run > 1 else \"\"))\n    return \"\".join(out)\n",
+  "subgoals": [
+    {
+      "label": "① 빈 입력 방어 + 상태(prev, run) 초기화",
+      "lines": [
+        0,
+        4
+      ]
+    },
+    {
+      "label": "② 순회: 같으면 run+1, 바뀌면 직전 구간 확정 후 리셋",
+      "lines": [
+        5,
+        10
+      ]
+    },
+    {
+      "label": "③ ★마지막 구간 확정 (루프 밖 한 번 더)",
+      "lines": [
+        11,
+        12
+      ]
+    }
+  ],
+  "line_notes": {
+    "1": "빈 문자열 — 엣지 케이스 1번",
+    "4": "첫 문자로 상태 시작 — s[1:]부터 순회하는 이유",
+    "9": "run 1이면 숫자 생략 (a1 아님 a) — 문제 조건 그대로",
+    "11": "★루프가 끝나도 마지막 run은 확정 안 됨 — 코테 오답 최다 지점"
+  },
+  "func": "compress",
+  "tests": [
+    {
+      "args": [
+        "aabcccc"
+      ],
+      "expected": "a2bc4"
+    },
+    {
+      "args": [
+        "abc"
+      ],
+      "expected": "abc"
+    },
+    {
+      "args": [
+        ""
+      ],
+      "expected": ""
+    },
+    {
+      "args": [
+        "aaaa"
+      ],
+      "expected": "a4"
+    },
+    {
+      "args": [
+        "aabbaa"
+      ],
+      "expected": "a2b2a2"
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ('ab' * 500000,)",
+    "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "상태(prev, run) 추적 — 문자가 바뀌는 순간에만 확정",
+    "fps": 0,
+    "frames": [
+      "a a b c c c c\n─┬─ ┬ ─┬────\n run=2 1  run=4\n\nout: 'a2' → 'a2b' → (루프 끝) +'c4'  ← 마지막은 루프 밖에서!"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 2675 문자열 반복 (브론즈1)",
+      "url": "https://www.acmicpc.net/problem/2675"
+    },
+    {
+      "name": "HackerRank — String Compression 계열(Super Reduced String)",
+      "url": "https://www.hackerrank.com/challenges/reduced-string/problem"
+    },
+    {
+      "name": "HackerRank — Sherlock and the Valid String",
+      "url": "https://www.hackerrank.com/challenges/sherlock-and-valid-string/problem"
+    },
+    {
+      "name": "백준 20291 파일 정리 (실버3)",
+      "url": "https://www.acmicpc.net/problem/20291"
+    }
+  ]
+}

@@ -387,7 +387,7 @@ async def test_diagram_panel_f2(tmp_path, monkeypatch):
         assert "hidden" in panel.classes
         await pilot.press("f2")
         assert "hidden" not in panel.classes
-        assert len(panel._frames) == 5     # BFS 파도 5프레임
+        assert len(panel._frames) >= 1     # 카타별 프레임 수 상이(BFS=5, 어법=1)
         await pilot.press("f2")
         assert "hidden" in panel.classes
 

@@ -1,0 +1,133 @@
+{
+  "id": "sim-robot",
+  "type": "implementation",
+  "title": "구현 — 로봇 이동 시뮬레이션",
+  "belt": "구현",
+  "desc": "명령대로 격자 위 이동(벽이면 무시). 코테 1번 유형의 원형.",
+  "expected_complexity": "O(K)  (K=명령 수)",
+  "think_prompt": "시뮬레이션의 뼈대는? (상태 변수 → 명령 순회 → 유효성 검사 → 상태 갱신. 방향을 어떻게 데이터로 만들까?)",
+  "think_model": "상태(r,c) + 방향표(dict: 명령→(dr,dc)). 매 명령: 다음 좌표 계산 → 경계 검사 → 유효할 때만 갱신. '조건대로 정확히'가 전부 — 알고리즘보다 꼼꼼함.",
+  "code": "def simulate(n, commands):\n    r, c = 0, 0\n    moves = {\"U\": (-1, 0), \"D\": (1, 0), \"L\": (0, -1), \"R\": (0, 1)}\n    for cmd in commands:\n        dr, dc = moves[cmd]\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < n and 0 <= nc < n:\n            r, c = nr, nc\n    return (r, c)\n",
+  "subgoals": [
+    {
+      "label": "① 상태 정의: 현재 위치 (0,0) + 방향표(명령→이동량)",
+      "lines": [
+        0,
+        2
+      ]
+    },
+    {
+      "label": "② 명령 순회: 다음 좌표 계산",
+      "lines": [
+        3,
+        5
+      ]
+    },
+    {
+      "label": "③ 유효성 검사 후에만 이동 (벽=무시)",
+      "lines": [
+        6,
+        7
+      ]
+    },
+    {
+      "label": "④ 최종 위치 반환",
+      "lines": [
+        8,
+        8
+      ]
+    }
+  ],
+  "line_notes": {
+    "1": "시작 상태 — 시뮬레이션은 '상태'를 정의하는 데서 시작",
+    "2": "★방향을 dict 데이터로 — if U elif D... 분기 지옥을 없애는 코테 핵심 패턴",
+    "4": "명령 하나 = 상태 전이 하나",
+    "6": "경계 검사(0 <= x < n) — 시뮬레이션 문제 오답의 8할은 여기",
+    "7": "유효할 때만 갱신. '무시' 조건을 코드 그대로 옮기기"
+  },
+  "func": "simulate",
+  "tests": [
+    {
+      "args": [
+        3,
+        "RRD"
+      ],
+      "expected": [
+        1,
+        2
+      ]
+    },
+    {
+      "args": [
+        3,
+        "UUL"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        1,
+        "RDLU"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        2,
+        "DRUL"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        3,
+        "DDRR"
+      ],
+      "expected": [
+        2,
+        2
+      ]
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return (100, 'RDLU' * 250000)",
+    "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "명령 R R D — 상태(위치)가 한 명령에 하나씩 전이. 벽이면 그 명령만 무시",
+    "fps": 1.0,
+    "frames": [
+      "🤖 · ·\n· · ·\n· · ·\n\n명령: [R] R D   시작 (0,0)",
+      "· 🤖 ·\n· · ·\n· · ·\n\n명령: R [R] D   → (0,1)",
+      "· · 🤖\n· · ·\n· · ·\n\n명령: R R [D]   → (0,2)",
+      "· · ·\n· · 🤖\n· · ·\n\n완료: (1,2)     명령 소진 = 끝"
+    ]
+  },
+  "resources": [
+    {
+      "name": "백준 14503 로봇 청소기 (골드5 — 삼성 기출)",
+      "url": "https://www.acmicpc.net/problem/14503"
+    },
+    {
+      "name": "HackerRank — The Grid Search",
+      "url": "https://www.hackerrank.com/challenges/the-grid-search/problem"
+    },
+    {
+      "name": "HackerRank — Kangaroo (조건 시뮬레이션)",
+      "url": "https://www.hackerrank.com/challenges/kangaroo/problem"
+    },
+    {
+      "name": "백준 3190 뱀 (골드4 — 삼성 기출)",
+      "url": "https://www.acmicpc.net/problem/3190"
+    }
+  ]
+}

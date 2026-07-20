@@ -1,0 +1,23 @@
+# WARFRONT 2 — 50일 커리큘럼 배치 (리서치 근거: 출제빈도×난이도, DESIGN.md §6)
+# 카타 15종이 30일 학습기의 전 유형 슬롯을 커버. 각 일차 = 카타(모드 진행) + 실전 링크 숙제.
+phase1:
+  D1:      {kata: py-parse,          note: "온보딩 — 코테 어법(파싱·dict)"}
+  D2-D4:   {kata: sim-robot,         note: "구현/시뮬레이션 I (최빈출 1위)"}
+  D5-D6:   {kata: topk-counter,      note: "해시 (카카오 1~2번 단골)"}
+  D7:      {random_defense: 1, note: "유형 감춘 실버 2문제 — resources에서 선택"}
+  D8-D9:   {kata: greedy-meetings,   note: "그리디+정렬 (자신감 구간)"}
+  D10-D11: {kata: stack-brackets,    note: "스택"}
+  D12-D13: {kata: heap-merge,        note: "힙/우선순위큐"}
+  D14:     {random_defense: 2}
+  D15-D17: {kata: backtrack-subset,  note: "완전탐색/백트래킹"}
+  D18-D21: {kata: bfs-grid,          note: "BFS (최중요 4일 집중)"}
+  D22-D23: {kata: dfs-islands,       note: "DFS 연결요소"}
+  D24-D25: {kata: string-compress,   note: "구현 심화 (상태추적 문자열)"}
+  D26-D28: {kata: [dp-kadane, dp-grid], note: "DP 1차원→2차원 (후반 배치 정설)"}
+  D29:     {kata: [binary-cut, twopointer-pairs], note: "이분탐색·투포인터"}
+  D30:     {mock: standard, note: "중간 모의 (120분/3문제)"}
+phase2:
+  rule_odd:  "FSRS 기한 카드 복습 — 재현(recall)·구현(solve) 중심 + 오답 재풀이"
+  rule_even: "모의 코테 로테이션 — 표준형 120분/3 ×6, 삼성형 180분/2 ×2"
+  D43:       {kata: dijkstra, note: "선택 모듈 (카카오 대비)"}
+  D49-D50:   {mock: final, note: "최종 모의 2연전 — 3문제 중 2솔 안정 = 합격 판정"}
