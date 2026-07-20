@@ -1,0 +1,71 @@
+{
+  "id": "v-greedy-boats",
+  "type": "greedy",
+  "title": "변형·그리디 — 구명보트 (투포인터 결합)",
+  "belt": "그리디",
+  "desc": "보트당 최대 2명, 무게 제한. 전원 구조에 필요한 최소 보트 수. (두 유형이 결합되는 실전형)",
+  "expected_complexity": "O(N log N)",
+  "think_prompt": "누구와 누구를 짝지어야 보트가 최소가 되나? '가장 무거운 사람'의 처리 방법을 먼저 결정해보라.",
+  "think_model": "정렬 후 양끝 투포인터: 최무거움+최가벼움이 같이 타지면 둘 다 소진, 아니면 무거운 쪽 혼자. 그리디 교환논증 + 투포인터 이동.",
+  "code": "def boats(people, limit):\n    arr = sorted(people)\n    lo, hi = 0, len(arr) - 1\n    count = 0\n    while lo <= hi:\n        if arr[lo] + arr[hi] <= limit:\n            lo += 1\n        hi -= 1\n        count += 1\n    return count\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "boats",
+  "tests": [
+    {
+      "args": [
+        [
+          70,
+          50,
+          80,
+          50
+        ],
+        100
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        [
+          70,
+          80
+        ],
+        100
+      ],
+      "expected": 2
+    },
+    {
+      "args": [
+        [
+          40,
+          50
+        ],
+        90
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        [
+          100
+        ],
+        100
+      ],
+      "expected": 1
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return ([40 + (i % 200) for i in range(1000000)], 240)",
+    "time_limit": 3.0
+  },
+  "resources": [
+    {
+      "name": "프로그래머스 — 구명보트 (Lv2, 원형)",
+      "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42885"
+    },
+    {
+      "name": "HackerRank — Max Min (그리디+정렬)",
+      "url": "https://www.hackerrank.com/challenges/angry-children/problem"
+    }
+  ]
+}

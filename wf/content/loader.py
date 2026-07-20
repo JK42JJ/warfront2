@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 KATA_DIR = Path(__file__).parent / "katas"
+PROBLEM_DIR = Path(__file__).parent / "problems"
 
 
 @dataclass
@@ -49,3 +50,19 @@ def get_kata(kata_id: str) -> Kata:
         if k.id == kata_id:
             return k
     raise KeyError(kata_id)
+
+
+def load_problems() -> list[Kata]:
+    """변형 문제 은행 — 같은 유형, 다른 문제 (solve 전용)."""
+    out = []
+    for p in sorted(PROBLEM_DIR.glob("*.json")):
+        out.append(Kata(**json.loads(p.read_text(encoding="utf-8"))))
+    return out
+
+
+def get_any(item_id: str) -> Kata:
+    """카타·변형문제 통합 조회."""
+    for k in load_katas() + load_problems():
+        if k.id == item_id:
+            return k
+    raise KeyError(item_id)

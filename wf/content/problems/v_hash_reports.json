@@ -1,0 +1,85 @@
+{
+  "id": "v-hash-reports",
+  "type": "hash",
+  "title": "변형·해시 — 신고 결과 받기",
+  "belt": "해시",
+  "desc": "유저가 서로 신고(중복 무시). k회 이상 신고당하면 정지. 각 유저가 받을 '정지 알림 메일 수'를 id 순서로 반환.",
+  "expected_complexity": "O(N+M)",
+  "think_prompt": "중복 신고를 어떻게 제거하나? '누가 몇 번 신고당했나'와 '누가 누굴 신고했나'에 필요한 자료구조는?",
+  "think_model": "set으로 (신고자,피신고자) 중복 제거 → dict로 피신고 횟수 집계 → 정지자 set → 신고 쌍 재순회하며 신고자에게 메일 카운트. 해시 3연타.",
+  "code": "def report_result(id_list, reports, k):\n    pairs = set()\n    for r in reports:\n        a, b = r.split()\n        pairs.add((a, b))\n    cnt = {}\n    for a, b in pairs:\n        cnt[b] = cnt.get(b, 0) + 1\n    banned = {u for u, c in cnt.items() if c >= k}\n    mails = {u: 0 for u in id_list}\n    for a, b in pairs:\n        if b in banned:\n            mails[a] += 1\n    return [mails[u] for u in id_list]\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "report_result",
+  "tests": [
+    {
+      "args": [
+        [
+          "muzi",
+          "frodo",
+          "apeach",
+          "neo"
+        ],
+        [
+          "muzi frodo",
+          "apeach frodo",
+          "frodo neo",
+          "muzi neo",
+          "apeach muzi"
+        ],
+        2
+      ],
+      "expected": [
+        2,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "args": [
+        [
+          "con",
+          "ryan"
+        ],
+        [
+          "ryan con",
+          "ryan con",
+          "ryan con",
+          "ryan con"
+        ],
+        3
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        [
+          "a"
+        ],
+        [],
+        1
+      ],
+      "expected": [
+        0
+      ]
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    ids = [f'u{i}' for i in range(1000)]\n    reports = [f'u{i % 1000} u{(i * 7) % 1000}' for i in range(200000)]\n    return (ids, reports, 3)",
+    "time_limit": 2.5
+  },
+  "resources": [
+    {
+      "name": "프로그래머스 — 신고 결과 받기 (Lv1, 카카오)",
+      "url": "https://school.programmers.co.kr/learn/courses/30/lessons/92334"
+    },
+    {
+      "name": "HackerRank — Sherlock and Anagrams (해시)",
+      "url": "https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem"
+    }
+  ]
+}

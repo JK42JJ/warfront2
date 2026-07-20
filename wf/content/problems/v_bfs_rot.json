@@ -1,0 +1,99 @@
+{
+  "id": "v-bfs-rot",
+  "type": "bfs",
+  "title": "변형·BFS — 창고 부패 확산 (다중 시작점)",
+  "belt": "탐색",
+  "desc": "0빈칸/1신선/2부패. 매일 부패가 상하좌우 신선을 감염. 전부 부패까지 최소 일수, 불가 -1, 신선 없으면 0. (백준 토마토 원형)",
+  "expected_complexity": "O(N·M)",
+  "think_prompt": "시작점이 여러 개면 BFS가 어떻게 달라지나? '모든 부패를 큐에 먼저 넣고 시작'이 왜 동시 확산과 같나?",
+  "think_model": "모든 부패 칸을 거리 0으로 큐에 선적재 = 다중 시작점 BFS. 층 확장이 곧 '하루'. 끝나고 신선이 남아있으면 -1.",
+  "code": "from collections import deque\n\ndef rot_days(grid):\n    n, m = len(grid), len(grid[0])\n    q = deque()\n    fresh = 0\n    for r in range(n):\n        for c in range(m):\n            if grid[r][c] == 2:\n                q.append((r, c, 0))\n            elif grid[r][c] == 1:\n                fresh += 1\n    if fresh == 0:\n        return 0\n    days = 0\n    while q:\n        r, c, d = q.popleft()\n        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < m and grid[nr][nc] == 1:\n                grid[nr][nc] = 2\n                fresh -= 1\n                days = d + 1\n                q.append((nr, nc, d + 1))\n    return days if fresh == 0 else -1\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "rot_days",
+  "tests": [
+    {
+      "args": [
+        [
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1
+          ]
+        ]
+      ],
+      "expected": 4
+    },
+    {
+      "args": [
+        [
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1
+          ]
+        ]
+      ],
+      "expected": -1
+    },
+    {
+      "args": [
+        [
+          [
+            2,
+            2
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          [
+            1
+          ]
+        ]
+      ],
+      "expected": -1
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 400\n    g = [[1] * n for _ in range(n)]\n    g[0][0] = 2\n    return (g,)",
+    "time_limit": 3.0
+  },
+  "resources": [
+    {
+      "name": "백준 7576 토마토 (골드5 — 원형)",
+      "url": "https://www.acmicpc.net/problem/7576"
+    },
+    {
+      "name": "백준 2178 미로 탐색 (실버1)",
+      "url": "https://www.acmicpc.net/problem/2178"
+    }
+  ]
+}

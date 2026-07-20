@@ -1,0 +1,77 @@
+{
+  "id": "v-sim-spiral",
+  "type": "implementation",
+  "title": "변형·구현 — 달팽이 격자 채우기",
+  "belt": "구현",
+  "desc": "n×n 격자를 시계방향 나선으로 1..n² 채워 반환. (같은 유형, 다른 문제: 방향 전환 조건을 스스로 설계)",
+  "expected_complexity": "O(N²)",
+  "think_prompt": "언제 방향을 꺾어야 하나? '벽 또는 이미 채운 칸을 만나면'을 코드 조건으로 옮겨보라.",
+  "think_model": "방향벡터 (dr,dc)로 직진, 다음 칸이 범위 밖이거나 이미 채워졌으면 시계 회전 (dr,dc)→(dc,-dr). sim-robot과 같은 상태전이 골격.",
+  "code": "def snail(n):\n    grid = [[0] * n for _ in range(n)]\n    r = c = 0\n    dr, dc = 0, 1\n    v = 1\n    for _ in range(n * n):\n        grid[r][c] = v\n        v += 1\n        nr, nc = r + dr, c + dc\n        if not (0 <= nr < n and 0 <= nc < n) or grid[nr][nc]:\n            dr, dc = dc, -dr\n            nr, nc = r + dr, c + dc\n        r, c = nr, nc\n    return grid\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "snail",
+  "tests": [
+    {
+      "args": [
+        1
+      ],
+      "expected": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "args": [
+        2
+      ],
+      "expected": [
+        [
+          1,
+          2
+        ],
+        [
+          4,
+          3
+        ]
+      ]
+    },
+    {
+      "args": [
+        3
+      ],
+      "expected": [
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          8,
+          9,
+          4
+        ],
+        [
+          7,
+          6,
+          5
+        ]
+      ]
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    return (600,)",
+    "time_limit": 3.0
+  },
+  "resources": [
+    {
+      "name": "백준 1913 달팽이 (실버3)",
+      "url": "https://www.acmicpc.net/problem/1913"
+    },
+    {
+      "name": "HackerRank — Matrix Layer Rotation",
+      "url": "https://www.hackerrank.com/challenges/matrix-rotation-algo/problem"
+    }
+  ]
+}

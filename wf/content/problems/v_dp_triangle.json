@@ -1,0 +1,86 @@
+{
+  "id": "v-dp-triangle",
+  "type": "dp",
+  "title": "변형·DP — 정수 삼각형 최대합",
+  "belt": "DP",
+  "desc": "꼭대기에서 바닥까지, 아래로 좌/우 대각으로만. 경로 합의 최댓값. (격자 DP의 삼각형판)",
+  "expected_complexity": "O(N²)",
+  "think_prompt": "dp[i][j]에 도달하는 경로는 위의 어느 두 칸에서 오나? 가장자리(j=0, j=i)는 왜 특별한가?",
+  "think_model": "dp[i][j] = max(dp[i-1][j-1], dp[i-1][j]) + t[i][j], 가장자리는 한쪽만. 답 = 마지막 행 max. dp-grid와 같은 골격, 모양만 삼각형.",
+  "code": "def triangle_max(t):\n    n = len(t)\n    dp = [row[:] for row in t]\n    for i in range(1, n):\n        for j in range(i + 1):\n            if j == 0:\n                dp[i][j] += dp[i-1][0]\n            elif j == i:\n                dp[i][j] += dp[i-1][j-1]\n            else:\n                dp[i][j] += max(dp[i-1][j-1], dp[i-1][j])\n    return max(dp[-1])\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "triangle_max",
+  "tests": [
+    {
+      "args": [
+        [
+          [
+            7
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            8,
+            1,
+            0
+          ],
+          [
+            2,
+            7,
+            4,
+            4
+          ],
+          [
+            4,
+            5,
+            2,
+            6,
+            5
+          ]
+        ]
+      ],
+      "expected": 30
+    },
+    {
+      "args": [
+        [
+          [
+            5
+          ]
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          [
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      ],
+      "expected": 4
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 700\n    return ([[(i * j) % 10 for j in range(i + 1)] for i in range(n)],)",
+    "time_limit": 3.0
+  },
+  "resources": [
+    {
+      "name": "백준 1932 정수 삼각형 (실버1 — 원형)",
+      "url": "https://www.acmicpc.net/problem/1932"
+    },
+    {
+      "name": "프로그래머스 — 정수 삼각형 (Lv3)",
+      "url": "https://school.programmers.co.kr/learn/courses/30/lessons/43105"
+    }
+  ]
+}

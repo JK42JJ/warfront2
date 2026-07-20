@@ -1,0 +1,93 @@
+{
+  "id": "v-bfs-far",
+  "type": "bfs",
+  "title": "변형·BFS — 가장 외딴 바다",
+  "belt": "탐색",
+  "desc": "1땅/0바다. 어떤 바다 칸이 '가장 가까운 땅'에서 가장 먼가 — 그 거리를 반환. 땅이나 바다가 없으면 -1.",
+  "expected_complexity": "O(N·M)",
+  "think_prompt": "바다마다 BFS를 돌리면 O((NM)²). 거꾸로 '모든 땅에서 동시에' 퍼뜨리면 왜 한 번에 끝나나?",
+  "think_model": "발상 뒤집기: 모든 땅을 시작점으로 다중 BFS → 각 바다에 '가장 가까운 땅까지 거리'가 자동으로 새겨짐. 그 최댓값이 답.",
+  "code": "from collections import deque\n\ndef farthest_sea(grid):\n    n, m = len(grid), len(grid[0])\n    q = deque()\n    dist = [[-1] * m for _ in range(n)]\n    for r in range(n):\n        for c in range(m):\n            if grid[r][c] == 1:\n                q.append((r, c))\n                dist[r][c] = 0\n    if not q or len(q) == n * m:\n        return -1\n    best = 0\n    while q:\n        r, c = q.popleft()\n        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < m and dist[nr][nc] == -1:\n                dist[nr][nc] = dist[r][c] + 1\n                best = max(best, dist[nr][nc])\n                q.append((nr, nc))\n    return best\n",
+  "subgoals": [],
+  "line_notes": {},
+  "func": "farthest_sea",
+  "tests": [
+    {
+      "args": [
+        [
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ]
+        ]
+      ],
+      "expected": 2
+    },
+    {
+      "args": [
+        [
+          [
+            1,
+            0
+          ]
+        ]
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "expected": -1
+    },
+    {
+      "args": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ]
+      ],
+      "expected": -1
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 400\n    g = [[0] * n for _ in range(n)]\n    g[0][0] = 1\n    return (g,)",
+    "time_limit": 3.0
+  },
+  "resources": [
+    {
+      "name": "백준 17086 아기 상어 2 (실버1 — 원형)",
+      "url": "https://www.acmicpc.net/problem/17086"
+    },
+    {
+      "name": "LeetCode 1162 As Far from Land as Possible",
+      "url": "https://leetcode.com/problems/as-far-from-land-as-possible/"
+    }
+  ]
+}
