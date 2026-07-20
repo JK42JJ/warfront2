@@ -112,3 +112,37 @@ def today_session_count(conn: sqlite3.Connection) -> int:
     return conn.execute(
         "SELECT COUNT(*) FROM sessions WHERE day=?", (date.today().isoformat(),)
     ).fetchone()[0]
+
+
+def dump_sessions(conn: sqlite3.Connection) -> list[dict]:
+    """전체 세션을 복원 가능한 형태로 덤프 (records repo 백업용)."""
+    rows = conn.execute(
+        "SELECT day, kata_id, mode, wpm, accuracy, elapsed, errors, think_answer, created_at"
+        " FROM sessions ORDER BY id").fetchall()
+    keys = ["day", "kata_id", "mode", "wpm", "accuracy", "elapsed", "errors",
+            "think_answer", "created_at"]
+    return [dict(zip(keys, r)) for r in rows]
+
+
+def import_sessions(conn: sqlite3.Connection, rows: list[dict]) -> int:
+    """백업 세션을 DB로 복원 — bests 재계산, 시작일은 최초 세션일로."""
+    if not rows:
+        return 0
+    for r in rows:
+        conn.execute(
+            "INSERT INTO sessions (day, kata_id, mode, wpm, accuracy, elapsed, errors,"
+            " think_answer, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+            (r["day"], r["kata_id"], r["mode"], r.get("wpm"), r.get("accuracy"),
+             r.get("elapsed"), r.get("errors"), r.get("think_answer", ""),
+             r.get("created_at")))
+    # bests 재계산
+    conn.execute("DELETE FROM bests")
+    conn.execute(
+        "INSERT INTO bests (kata_id, mode, wpm, accuracy)"
+        " SELECT kata_id, mode, MAX(wpm), MAX(accuracy) FROM sessions GROUP BY kata_id, mode")
+    # 50일 시작일 = 최초 세션일 (이어가기)
+    first_day = conn.execute("SELECT MIN(day) FROM sessions").fetchone()[0]
+    conn.execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('start_date', ?)",
+                 (first_day,))
+    conn.commit()
+    return len(rows)

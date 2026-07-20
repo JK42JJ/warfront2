@@ -59,6 +59,12 @@ def push_records_repo() -> str:
     rec_dir.mkdir(exist_ok=True)
     (rec_dir / f"{agg['date']}.json").write_text(
         json.dumps(agg, ensure_ascii=False, indent=1), encoding="utf-8")
+    # 전체 세션 로그 — 새 기계에서 wf setup 시 복원의 원본
+    conn2 = db.connect()
+    sessions = db.dump_sessions(conn2)
+    conn2.close()
+    (rec_dir / "sessions.jsonl").write_text(
+        "\n".join(json.dumps(s, ensure_ascii=False) for s in sessions), encoding="utf-8")
     def git(*a):
         return subprocess.run(["git", "-C", str(DB_DIR), *a],
                               capture_output=True, text=True, timeout=30)

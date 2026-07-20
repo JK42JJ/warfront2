@@ -64,15 +64,31 @@ def setup(repo_url: str = typer.Argument(..., help="내 기록 저장용 GitHub 
                                        capture_output=True, text=True, timeout=30)
     if not (DB_DIR / ".git").exists():
         git("init", "-q", "-b", "main")
-    (DB_DIR / ".gitignore").write_text("wf.db\n")   # DB 원본은 로컬만, 기록 JSON만 push
     remotes = git("remote").stdout.split()
     if "origin" in remotes:
         git("remote", "set-url", "origin", repo_url)
     else:
         git("remote", "add", "origin", repo_url)
+    # ★pull 먼저 — 로컬 파일을 미리 만들면 원격과 충돌해 복원이 막힌다
+    pulled = git("pull", "--rebase", "origin", "main")
+    if not (DB_DIR / ".gitignore").exists():
+        (DB_DIR / ".gitignore").write_text("wf.db\n")   # DB 원본은 로컬만
     (DB_DIR / "records").mkdir(exist_ok=True)
-    typer.echo(f"✅ 기록 repo 설정 완료 → {repo_url}\n"
-               f"   이제 세션이 끝날 때마다 {DB_DIR}/records/ 가 자동 push됩니다.")
+    restored = 0
+    log = DB_DIR / "records/sessions.jsonl"
+    if pulled.returncode == 0 and log.exists():
+        from wf.store import db as dbmod
+        conn = dbmod.connect()
+        existing = conn.execute("SELECT COUNT(*) FROM sessions").fetchone()[0]
+        if existing == 0:
+            rows = [json.loads(l) for l in log.read_text(encoding="utf-8").splitlines() if l.strip()]
+            restored = dbmod.import_sessions(conn, rows)
+        conn.close()
+    typer.echo(f"✅ 기록 repo 설정 완료 → {repo_url}")
+    if restored:
+        typer.echo(f"♻️  기존 기록 {restored}세션 복원 — 일차·연속일·단계 진행을 이어갑니다.")
+    else:
+        typer.echo(f"   세션이 끝날 때마다 {DB_DIR}/records/ 가 자동 push됩니다.")
 
 
 @cli.command()

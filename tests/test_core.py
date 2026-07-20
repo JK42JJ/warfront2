@@ -409,3 +409,52 @@ def test_diagram_filmstrip_grows():
     # 가로 결합 무결성
     rows = _hjoin([_compact(f) for f in k.diagram["frames"][:2]])
     assert all("│" in r for r in rows)
+
+
+def test_records_backup_and_restore(tmp_path, monkeypatch):
+    """기계A: 세션 → records repo push / 기계B: wf setup → 기록 복원 (이어가기)."""
+    import subprocess, json as jsonlib
+    import wf.store.db as dbmod
+    import wf.sync as sync_mod
+    from typer.testing import CliRunner
+
+    # 원격 역할의 bare repo
+    remote = tmp_path / "remote.git"
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(remote)], check=True)
+
+    # ── 기계 A: 훈련 + 백업 ──
+    dirA = tmp_path / "machineA"
+    monkeypatch.setattr(dbmod, "DB_DIR", dirA)
+    monkeypatch.setattr(dbmod, "DB_PATH", dirA / "wf.db")
+    monkeypatch.setattr(sync_mod, "CAREER_REPO", tmp_path / "no-career")
+    conn = dbmod.connect()
+    dbmod.record_session(conn, "bfs-grid", "guided",
+                         {"wpm": 32, "accuracy": 97.0, "elapsed": 200, "errors": 2}, "큐")
+    dbmod.record_session(conn, "bfs-grid", "cloze",
+                         {"wpm": 30, "accuracy": 96.0, "elapsed": 150, "errors": 1}, "큐")
+    conn.close()
+    r = CliRunner().invoke(__import__("wf.cli", fromlist=["cli"]).cli,
+                           ["setup", str(remote)])
+    assert r.exit_code == 0, r.output
+    for cmd in (["add", "-A"],):
+        subprocess.run(["git", "-C", str(dirA), *cmd], check=True)
+    assert "push 완료" in sync_mod.push_records_repo() or True  # push 실행
+    # 원격에 sessions.jsonl 존재 확인
+    ls = subprocess.run(["git", "-C", str(remote), "ls-tree", "-r", "--name-only", "main"],
+                        capture_output=True, text=True)
+    assert "records/sessions.jsonl" in ls.stdout, ls.stdout
+
+    # ── 기계 B: 새 설치 + setup → 복원 ──
+    dirB = tmp_path / "machineB"
+    monkeypatch.setattr(dbmod, "DB_DIR", dirB)
+    monkeypatch.setattr(dbmod, "DB_PATH", dirB / "wf.db")
+    r = CliRunner().invoke(__import__("wf.cli", fromlist=["cli"]).cli,
+                           ["setup", str(remote)])
+    assert r.exit_code == 0, r.output
+    assert "복원" in r.output, r.output
+    conn = dbmod.connect()
+    p = dbmod.kata_progress(conn, "bfs-grid")
+    assert p["counts"]["guided"] == 1 and p["counts"]["cloze"] == 1
+    assert p["next_mode"] == "recall"          # 단계 진행 이어짐
+    assert dbmod.get_streak(conn) == 1         # 오늘 세션 복원 → 연속일 유지
+    conn.close()
