@@ -124,9 +124,17 @@ def export_and_push(repo: Path | None = None) -> str:
 
 
 def sync_all() -> str:
-    """세션 종료 시 호출 — career repo(James) + 개인 기록 repo(wf setup) 모두 best-effort."""
-    msgs = [export_and_push()]
-    rec = push_records_repo()
-    if rec not in ("기록 repo 미설정",):
-        msgs.append(rec)
-    return " / ".join(msgs)
+    """세션 종료 시 호출 — career repo(James) + 개인 기록 repo(wf setup) 모두 best-effort.
+
+    ★어떤 예외도 밖으로 던지지 않는다 — 싱크가 훈련 앱을 죽이면 안 됨
+    (2026-07-20 실크래시: 구버전 프로세스 + 새 코드 혼합 → AttributeError → Worker 사망).
+    """
+    msgs = []
+    for fn in (export_and_push, push_records_repo):
+        try:
+            m = fn()
+            if m != "기록 repo 미설정":
+                msgs.append(m)
+        except Exception as e:
+            msgs.append(f"싱크 스킵({type(e).__name__})")
+    return " / ".join(msgs) if msgs else "싱크 없음"

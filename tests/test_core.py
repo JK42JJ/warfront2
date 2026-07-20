@@ -477,3 +477,14 @@ async def test_sprint_mode(tmp_path, monkeypatch):
         await pilot.press("t")
         await pilot.pause()
         assert not app.screen.query("#sprint-banner")
+
+
+def test_sync_all_never_raises(monkeypatch):
+    """회귀(2026-07-20 실크래시): 싱크 내부 예외가 앱을 죽이면 안 된다."""
+    import wf.sync as sync_mod
+    def boom():
+        raise AttributeError("stale module")
+    monkeypatch.setattr(sync_mod, "export_and_push", boom)
+    monkeypatch.setattr(sync_mod, "push_records_repo", boom)
+    msg = sync_mod.sync_all()          # 예외 없이 반환해야
+    assert "싱크 스킵" in msg

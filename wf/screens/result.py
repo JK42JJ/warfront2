@@ -84,11 +84,14 @@ class ResultScreen(Screen):
         self.run_worker(self._sync_career, thread=True, exclusive=True)
 
     def _sync_career(self) -> None:
-        from wf import sync
-        msg = sync.sync_all()
-        if "동기화 완료" in msg or "push 완료" in msg:
-            self.app.call_from_thread(
-                self.notify, f"📊 일일 루틴 반영 — {msg}", timeout=4)
+        try:
+            from wf import sync
+            msg = sync.sync_all()
+            if "동기화 완료" in msg or "push 완료" in msg:
+                self.app.call_from_thread(
+                    self.notify, f"📊 일일 루틴 반영 — {msg}", timeout=4)
+        except Exception:
+            pass  # 싱크는 어떤 경우에도 훈련을 방해하지 않는다
 
     def action_home(self) -> None:
         from wf.screens.home import HomeScreen
