@@ -1,18 +1,51 @@
-"""공용 위젯 — 개념도 패널(유니코드 다이어그램, 프레임 애니메이션 지원)."""
+"""공용 위젯 — 개념도 패널(유니코드 다이어그램, 프레임 애니메이션 + 필름스트립).
+
+James(2026-07-20): 애니메이션은 그대로 두고, 하단에 각 단계 스냅샷이
+오른쪽으로 늘어나며 쌓이게 — 전 단계를 한눈에 비교(타임라인).
+"""
 from __future__ import annotations
 
 from rich.text import Text
 from textual.widgets import Static
 
+CIRCLED = "①②③④⑤⑥⑦⑧⑨⑩"
+
+
+def _compact(frame: str) -> list[str]:
+    """스냅샷용 축약 — 첫 빈 줄 전(격자 부분)만."""
+    lines = []
+    for line in frame.splitlines():
+        if not line.strip():
+            break
+        lines.append(line)
+    return lines or frame.splitlines()[:3]
+
+
+def _hjoin(blocks: list[list[str]], sep: str = "  │  ") -> list[str]:
+    """블록들을 가로로 이어붙임(높이·폭 패딩)."""
+    if not blocks:
+        return []
+    height = max(len(b) for b in blocks)
+    widths = [max((len(l) for l in b), default=0) for b in blocks]
+    rows = []
+    for r in range(height):
+        cells = []
+        for b, w in zip(blocks, widths):
+            cell = b[r] if r < len(b) else ""
+            cells.append(cell.ljust(w))
+        rows.append(sep.join(cells))
+    return rows
+
 
 class DiagramPanel(Static):
-    """F2 개념도 — frames가 여러 장이면 fps로 순환(BFS 파도 등)."""
+    """F2 개념도 — 상단: 현재 프레임(애니메이션) / 하단: 단계 필름스트립(우측 증가)."""
 
     def __init__(self, **kwargs) -> None:
         super().__init__("", **kwargs)
         self._frames: list[str] = []
         self._caption = ""
         self._i = 0
+        self._shown = 0          # 필름스트립에 쌓인 단계 수(단조 증가 — 되감기지 않음)
         self._timer = None
 
     def toggle(self, diagram: dict | None) -> bool:
@@ -23,6 +56,7 @@ class DiagramPanel(Static):
             self._frames = diagram["frames"]
             self._caption = diagram.get("caption", "")
             self._i = 0
+            self._shown = 1
             self.remove_class("hidden")
             self._render_frame()
             fps = diagram.get("fps") or 0
@@ -37,6 +71,7 @@ class DiagramPanel(Static):
 
     def _advance(self) -> None:
         self._i = (self._i + 1) % len(self._frames)
+        self._shown = max(self._shown, self._i + 1)
         self._render_frame()
 
     def _render_frame(self) -> None:
@@ -47,4 +82,17 @@ class DiagramPanel(Static):
             text.append(f"   [{self._i + 1}/{len(self._frames)}]", style="dim")
         text.append("\n\n")
         text.append(self._frames[self._i])
+
+        # 하단 필름스트립: 지나간 단계가 우측으로 쌓임 (다중 프레임일 때만)
+        if len(self._frames) > 1:
+            blocks = [_compact(f) for f in self._frames[: self._shown]]
+            labels = [CIRCLED[i] if i < len(CIRCLED) else str(i + 1)
+                      for i in range(self._shown)]
+            widths = [max((len(l) for l in b), default=0) for b in blocks]
+            label_row = "  │  ".join(lab.center(w) for lab, w in zip(labels, widths))
+            text.append("\n\n")
+            text.append("─ 단계 타임라인 " + "─" * 30 + "\n", style="dim")
+            text.append(label_row + "\n", style="bold yellow")
+            for row in _hjoin(blocks):
+                text.append(row + "\n", style="grey66")
         self.update(text)

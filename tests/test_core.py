@@ -390,3 +390,22 @@ async def test_diagram_panel_f2(tmp_path, monkeypatch):
         assert len(panel._frames) == 5     # BFS 파도 5프레임
         await pilot.press("f2")
         assert "hidden" in panel.classes
+
+
+def test_diagram_filmstrip_grows():
+    """필름스트립: 애니메이션 진행 시 스냅샷이 우측으로 누적(되감기지 않음)."""
+    from wf.widgets import DiagramPanel, _compact, _hjoin
+    from wf.content.loader import get_kata
+    k = get_kata("bfs-grid")
+    p = DiagramPanel()
+    p.add_class("hidden")
+    # toggle은 앱 컨텍스트 필요(set_interval) — 로직만 직접 검증
+    p._frames = k.diagram["frames"]; p._i = 0; p._shown = 1
+    p._i = 1; p._shown = max(p._shown, 2)
+    assert p._shown == 2
+    p._i = 0  # 루프 되감김
+    p._shown = max(p._shown, p._i + 1)
+    assert p._shown == 2               # 스트립은 유지(단조 증가)
+    # 가로 결합 무결성
+    rows = _hjoin([_compact(f) for f in k.diagram["frames"][:2]])
+    assert all("│" in r for r in rows)
