@@ -22,6 +22,9 @@ class Kata:
     subgoals: list[dict] = field(default_factory=list)
     line_notes: dict = field(default_factory=dict)
     resources: list[dict] = field(default_factory=list)
+    func: str = ""
+    tests: list[dict] = field(default_factory=list)
+    perf: dict | None = None
 
     def subgoal_char_range(self, idx: int) -> tuple[int, int]:
         """서브골 idx의 (시작, 끝+1) 문자 오프셋 — cloze 활성 구간 계산용."""

@@ -40,6 +40,13 @@ class WarfrontApp(App):
                          color: $text-muted; margin: 0 4 0 0; }
     .hidden { display: none; }
 
+    /* ---- 구현(solve) ---- */
+    #solve { padding: 1 4; height: auto; }
+    #solve-box { height: auto; }
+    #solve-desc { height: auto; margin-bottom: 1; }
+    #editor { height: 18; border: tall $primary; }
+    #grade-panel { height: auto; border: tall $accent; padding: 1 2; margin-top: 1; }
+
     /* ---- 결과 ---- */
     #result { padding: 1 4; height: auto; }
     #result-title { text-align: center; width: 100%; height: auto; margin-bottom: 1; }

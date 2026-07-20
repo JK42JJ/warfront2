@@ -47,5 +47,90 @@
       "name": "백준 20291 파일 정리 (실버3)",
       "url": "https://www.acmicpc.net/problem/20291"
     }
-  ]
+  ],
+  "func": "top_k",
+  "tests": [
+    {
+      "args": [
+        [
+          "a",
+          "b",
+          "a",
+          "c",
+          "a",
+          "b"
+        ],
+        2
+      ],
+      "expected": [
+        [
+          "a",
+          3
+        ],
+        [
+          "b",
+          2
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "x"
+        ],
+        1
+      ],
+      "expected": [
+        [
+          "x",
+          1
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "b",
+          "a",
+          "b",
+          "a"
+        ],
+        2
+      ],
+      "expected": [
+        [
+          "a",
+          2
+        ],
+        [
+          "b",
+          2
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "z",
+          "y",
+          "x"
+        ],
+        2
+      ],
+      "expected": [
+        [
+          "x",
+          1
+        ],
+        [
+          "y",
+          1
+        ]
+      ]
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    words = [f'w{i % 5000}' for i in range(200000)]\n    return (words, 10)",
+    "time_limit": 2.0
+  }
 }

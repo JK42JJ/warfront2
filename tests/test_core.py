@@ -299,3 +299,70 @@ def test_cli_reset(tmp_path, monkeypatch):
     assert not fake.exists()
     r2 = CliRunner().invoke(cli, ["reset", "--yes"])
     assert "기록 없음" in r2.output
+
+
+# ---------- 백지 구현(재현·구현) — 기능 동등 판정 ----------
+def test_grader_functional_equivalence():
+    """동일 코드가 아니어도 기능이 맞으면 pass (James 질문의 확정 답)."""
+    from wf.engine.grader import grade
+    k = get_kata("bfs-grid")
+    # 변수명·구조가 모범과 완전히 다른 구현
+    different = '''
+from collections import deque
+def bfs(board, src, dst):
+    rows, cols = len(board), len(board[0])
+    frontier = deque([(tuple(src), 0)])
+    visited = {tuple(src)}
+    while frontier:
+        cell, dist = frontier.popleft()
+        if cell == tuple(dst):
+            return dist
+        y, x = cell
+        for ny, nx in ((y+1,x),(y-1,x),(y,x+1),(y,x-1)):
+            if 0 <= ny < rows and 0 <= nx < cols and board[ny][nx] == 0:
+                if (ny, nx) not in visited:
+                    visited.add((ny, nx))
+                    frontier.append(((ny, nx), dist + 1))
+    return -1
+'''
+    r = grade(different, k.func, k.tests, k.perf)
+    assert r["verdict"] == "pass", r
+
+
+@pytest.mark.asyncio
+async def test_solve_screen_pass_records(tmp_path, monkeypatch):
+    """재현 모드: THINK → 에디터에 (다른 스타일) 정답 → Ctrl+R → pass → 기록."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    # career 싱크는 테스트에서 무력화
+    import wf.sync as sync_mod
+    monkeypatch.setattr(sync_mod, "CAREER_REPO", tmp_path / "no-repo")
+    from textual.widgets import TextArea
+    from wf.app import WarfrontApp
+    from wf.screens.solve import SolveScreen
+    from wf.content.loader import get_kata
+
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        app.push_screen(SolveScreen(get_kata("topk-counter"), "recall"))
+        await pilot.pause()
+        screen = app.screen
+        for ch in "카운터 집계 후 힙":
+            await pilot.press(ch if ch != " " else "space")
+        await pilot.press("enter")
+        await pilot.pause()
+        assert screen.phase == "code"
+        # 모범과 다른 스타일의 정답을 에디터에 주입
+        screen.query_one("#editor", TextArea).text = (
+            "from collections import Counter\n"
+            "import heapq\n"
+            "def top_k(items, howmany):\n"
+            "    tally = Counter(items)\n"
+            "    return heapq.nsmallest(howmany, tally.items(), key=lambda p: (-p[1], p[0]))\n"
+        )
+        screen.action_grade()
+        await app.workers.wait_for_complete()
+        await pilot.pause()
+        assert screen.last_result["verdict"] == "pass"
+        conn = db.connect()
+        assert db.kata_progress(conn, "topk-counter")["counts"]["recall"] == 1
+        conn.close()

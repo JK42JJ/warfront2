@@ -69,5 +69,32 @@
       "name": "백준 1926 그림 (실버1)",
       "url": "https://www.acmicpc.net/problem/1926"
     }
-  ]
+  ],
+  "func": "bfs",
+  "tests": [
+    {
+      "args_repr": "([[0,0],[0,0]], (0,0), (1,1))",
+      "expected": 2
+    },
+    {
+      "args_repr": "([[0,1],[0,0]], (0,0), (1,1))",
+      "expected": 2
+    },
+    {
+      "args_repr": "([[0,1],[1,0]], (0,0), (1,1))",
+      "expected": -1
+    },
+    {
+      "args_repr": "([[0]], (0,0), (0,0))",
+      "expected": 0
+    },
+    {
+      "args_repr": "([[0,0,0],[1,1,0],[0,0,0]], (0,0), (2,0))",
+      "expected": 6
+    }
+  ],
+  "perf": {
+    "gen": "def make_args():\n    n = 400\n    grid = [[0]*n for _ in range(n)]\n    return (grid, (0,0), (n-1,n-1))",
+    "time_limit": 3.0
+  }
 }

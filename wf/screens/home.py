@@ -22,6 +22,7 @@ class HomeScreen(Screen):
         ("g", "open_mode('guided')", "보고"),
         ("b", "open_mode('cloze')", "빈칸"),
         ("r", "open_mode('recall')", "재현"),
+        ("s", "open_mode('solve')", "구현"),
         ("q", "quit_app", "종료"),
     ]
 
@@ -57,24 +58,26 @@ class HomeScreen(Screen):
                     key=kata.id,
                 )
             yield table
-            yield Static("⏎ 다음 단계 자동  ·  g 보고 / b 빈칸 / r 재현 (언제든 재수련)  ·  훈련 중 F1 힌트  ·  q 종료",
+            yield Static("⏎ 다음 단계 자동  ·  g 보고 / b 빈칸 / r 재현 / s 구현 (언제든 재수련)  ·  훈련 중 F1 힌트  ·  q 종료",
                          id="dash-help")
         yield Footer()
 
     def on_mount(self) -> None:
         self.query_one(DataTable).focus()
 
+    def _open(self, kata_id: str, mode: str) -> None:
+        from wf.content.loader import get_kata
+        kata = get_kata(kata_id)
+        if mode in ("recall", "solve"):     # 백지 구현 — 기능 동등 판정
+            from wf.screens.solve import SolveScreen
+            self.app.push_screen(SolveScreen(kata, mode))
+        else:                                # 타이핑 카타 — 보고/빈칸
+            from wf.screens.kata import KataScreen
+            self.app.push_screen(KataScreen(kata, mode))
+
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         kata_id = event.row_key.value
-        from wf.content.loader import get_kata
-        from wf.screens.kata import KataScreen
-        kata = get_kata(kata_id)
-        next_mode = self._progress[kata_id]["next_mode"]
-        if next_mode == "solve":
-            self.notify("구현 모드는 다음 업데이트(M2b: 채점 엔진)에서 열립니다 — 재현 반복 추천",
-                        severity="information")
-            next_mode = "recall"
-        self.app.push_screen(KataScreen(kata, next_mode))
+        self._open(kata_id, self._progress[kata_id]["next_mode"])
 
     def action_open_mode(self, mode: str) -> None:
         """선택된 카타를 지정 모드로 — 해금과 무관하게 언제든 재수련(반복이 기본기)."""
@@ -82,9 +85,7 @@ class HomeScreen(Screen):
         if table.cursor_row is None:
             return
         row_key, _ = table.coordinate_to_cell_key(table.cursor_coordinate)
-        from wf.content.loader import get_kata
-        from wf.screens.kata import KataScreen
-        self.app.push_screen(KataScreen(get_kata(row_key.value), mode))
+        self._open(row_key.value, mode)
 
     def action_quit_app(self) -> None:
         self.app.exit()

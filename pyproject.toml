@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "WARFRONT 2 — 50일 코딩테스트 합격 CLI 훈련기 (Think-First · 타건감 · FSRS 반복)"
 requires-python = ">=3.10"
 dependencies = [
-    "textual>=8.0",
+    "textual[syntax]>=8.0",
     "typer>=0.12",
     "fsrs>=6.0",
 ]
