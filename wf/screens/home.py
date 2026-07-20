@@ -19,6 +19,9 @@ MODE_KO = {"guided": "보고", "cloze": "빈칸", "recall": "재현", "solve": "
 
 class HomeScreen(Screen):
     BINDINGS = [
+        ("g", "open_mode('guided')", "보고"),
+        ("b", "open_mode('cloze')", "빈칸"),
+        ("r", "open_mode('recall')", "재현"),
         ("q", "quit_app", "종료"),
     ]
 
@@ -54,7 +57,7 @@ class HomeScreen(Screen):
                     key=kata.id,
                 )
             yield table
-            yield Static("⏎ 선택한 카타 시작(다음 단계 자동)  ·  힌트는 훈련 중 F1  ·  q 종료",
+            yield Static("⏎ 다음 단계 자동  ·  g 보고 / b 빈칸 / r 재현 (언제든 재수련)  ·  훈련 중 F1 힌트  ·  q 종료",
                          id="dash-help")
         yield Footer()
 
@@ -72,6 +75,16 @@ class HomeScreen(Screen):
                         severity="information")
             next_mode = "recall"
         self.app.push_screen(KataScreen(kata, next_mode))
+
+    def action_open_mode(self, mode: str) -> None:
+        """선택된 카타를 지정 모드로 — 해금과 무관하게 언제든 재수련(반복이 기본기)."""
+        table = self.query_one(DataTable)
+        if table.cursor_row is None:
+            return
+        row_key, _ = table.coordinate_to_cell_key(table.cursor_coordinate)
+        from wf.content.loader import get_kata
+        from wf.screens.kata import KataScreen
+        self.app.push_screen(KataScreen(get_kata(row_key.value), mode))
 
     def action_quit_app(self) -> None:
         self.app.exit()

@@ -267,3 +267,35 @@ def test_sync_aggregate_and_export(tmp_path, monkeypatch):
     today = date.today().isoformat()
     assert data[today]["sessions"] == 2
     assert "push 실패" in msg or "동기화 완료" in msg  # 리모트 없음 → 전자
+
+
+# ---------- 모드 재선택·초기화 ----------
+@pytest.mark.asyncio
+async def test_dashboard_mode_override_key(tmp_path, monkeypatch):
+    """g 키 = 해금 무관 '보고' 재수련 (반복이 기본기)."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.kata import KataScreen
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        await pilot.press("g")
+        await pilot.pause()
+        assert isinstance(app.screen, KataScreen)
+        assert app.screen.mode == "guided"
+
+
+def test_cli_reset(tmp_path, monkeypatch):
+    """wf reset --yes: DB 삭제 → 초기 상태."""
+    import wf.store.db as dbmod
+    fake = tmp_path / "wf.db"
+    conn = dbmod.connect(fake)
+    conn.close()
+    assert fake.exists()
+    monkeypatch.setattr(dbmod, "DB_PATH", fake)
+    from typer.testing import CliRunner
+    from wf.cli import cli
+    r = CliRunner().invoke(cli, ["reset", "--yes"])
+    assert r.exit_code == 0
+    assert not fake.exists()
+    r2 = CliRunner().invoke(cli, ["reset", "--yes"])
+    assert "기록 없음" in r2.output
