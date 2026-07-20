@@ -594,3 +594,24 @@ def test_indent_still_auto():
         s.feed(ch)
     s.feed("\n")
     assert s.target[s.pos] == "r"              # 4칸 들여쓰기 자동 통과
+
+
+def test_custom_content_merge(tmp_path, monkeypatch):
+    """개인 문제(~/.warfront2/custom)가 설치형과 병합 로드된다."""
+    import json
+    import wf.content.loader as loader
+    custom = tmp_path / "custom"
+    (custom / "katas").mkdir(parents=True)
+    (custom / "katas/my_problem.json").write_text(json.dumps({
+        "id": "my-custom", "type": "hash", "title": "개인 — 내가 만난 문제",
+        "belt": "해시", "think_prompt": "12345", "think_model": "m",
+        "code": "def f(x):\n    return x\n",
+        "func": "f", "tests": [{"args": [1], "expected": 1}]
+    }, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(loader, "CUSTOM_DIR", custom)
+    ids = [k.id for k in loader.load_katas()]
+    assert "my-custom" in ids and "bfs-grid" in ids     # 병합 확인
+    # 채점도 동작
+    from wf.engine.grader import grade
+    k = loader.get_any("my-custom")
+    assert grade(k.code, k.func, k.tests)["verdict"] == "pass"

@@ -69,7 +69,7 @@ def push_records_repo() -> str:
         return subprocess.run(["git", "-C", str(DB_DIR), *a],
                               capture_output=True, text=True, timeout=30)
     try:
-        git("add", "records")
+        git("add", "-A")   # records + custom(개인 문제) 백업
         if git("diff", "--cached", "--quiet").returncode != 0:
             git("commit", "-q", "-m",
                 f"warfront 기록 {agg['date']} — {agg['sessions']}세션 {agg['total_minutes']}분")

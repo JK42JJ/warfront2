@@ -28,7 +28,18 @@ class RecognitionScreen(Screen):
         super().__init__()
         bank = json.loads(BANK_PATH.read_text(encoding="utf-8"))
         self.types = bank["types"]
-        self.items = random.sample(bank["items"], min(n_items, len(bank["items"])))
+        pool = list(bank["items"])
+        # 개인 인식 문항 병합 (~/.warfront2/custom/recognition/*.json — items 배열)
+        custom_dir = Path.home() / ".warfront2/custom/recognition"
+        if custom_dir.exists():
+            for f in sorted(custom_dir.glob("*.json")):
+                try:
+                    data = json.loads(f.read_text(encoding="utf-8"))
+                    pool += [i for i in data.get("items", [])
+                             if i.get("answer") in self.types]
+                except Exception:
+                    continue          # 깨진 개인 파일은 조용히 무시
+        self.items = random.sample(pool, min(n_items, len(pool)))
         self.idx = 0
         self.correct_count = 0
         self.wrong: list[dict] = []

@@ -7,6 +7,8 @@ from pathlib import Path
 
 KATA_DIR = Path(__file__).parent / "katas"
 PROBLEM_DIR = Path(__file__).parent / "problems"
+# 개인 콘텐츠 — 설치형과 분리 (wf update 영향 없음, 기록 repo로 백업됨)
+CUSTOM_DIR = Path.home() / ".warfront2/custom"
 
 
 @dataclass
@@ -37,12 +39,17 @@ class Kata:
         return start, min(end, len(self.code))
 
 
+def _load_dir(d: Path) -> list[Kata]:
+    out = []
+    if d.exists():
+        for p in sorted(d.glob("*.json")):
+            out.append(Kata(**json.loads(p.read_text(encoding="utf-8"))))
+    return out
+
+
 def load_katas() -> list[Kata]:
-    katas = []
-    for p in sorted(KATA_DIR.glob("*.json")):
-        data = json.loads(p.read_text(encoding="utf-8"))
-        katas.append(Kata(**data))
-    return katas
+    """설치형 카타 + 개인 카타(~/.warfront2/custom/katas)."""
+    return _load_dir(KATA_DIR) + _load_dir(CUSTOM_DIR / "katas")
 
 
 def get_kata(kata_id: str) -> Kata:
@@ -53,11 +60,8 @@ def get_kata(kata_id: str) -> Kata:
 
 
 def load_problems() -> list[Kata]:
-    """변형 문제 은행 — 같은 유형, 다른 문제 (solve 전용)."""
-    out = []
-    for p in sorted(PROBLEM_DIR.glob("*.json")):
-        out.append(Kata(**json.loads(p.read_text(encoding="utf-8"))))
-    return out
+    """변형 문제 은행 (설치형 + 개인)."""
+    return _load_dir(PROBLEM_DIR) + _load_dir(CUSTOM_DIR / "problems")
 
 
 def get_any(item_id: str) -> Kata:

@@ -138,6 +138,13 @@ wf setup https://github.com/<계정>/my-records.git
 3. 끝 — 세션이 끝날 때마다 그날의 기록이 자동으로 올라가고,
    다른 컴퓨터에서 같은 명령을 치면 일차·연속일·진도가 복원된다
 
+## 내 문제 추가하기
+
+실전에서 만난 문제, 회사 특화 문제는 `~/.warfront2/custom/` 아래에
+같은 형식의 JSON으로 넣으면 대시보드와 드릴에 합쳐집니다. 기본 콘텐츠와
+분리돼 있어 `wf update`의 영향을 받지 않고, 기록 저장소로 함께 백업됩니다.
+형식은 [.claude/skills/wf-add-problem/SKILL.md](.claude/skills/wf-add-problem/SKILL.md)에 있습니다.
+
 ## 콘텐츠 출처
 
 프로그래머스 고득점 Kit, 카카오 공식 해설(2022~2026 공채), 삼성
