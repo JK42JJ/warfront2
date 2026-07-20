@@ -488,3 +488,20 @@ def test_sync_all_never_raises(monkeypatch):
     monkeypatch.setattr(sync_mod, "push_records_repo", boom)
     msg = sync_mod.sync_all()          # 예외 없이 반환해야
     assert "싱크 스킵" in msg
+
+
+def test_sprint_plan_volume_and_coverage():
+    """속성 모드: D2~6은 5카타(신규+복습), 신규는 14종 전부 커버, 복습은 전날까지 배운 것만."""
+    import json
+    from pathlib import Path
+    plan = json.loads((Path("wf/content/sprint.json")).read_text(encoding="utf-8"))["plan"]
+    all_new = []
+    for d in "123456":
+        day = plan[d]
+        total = len(day["new"]) + len(day["review"])
+        assert total == 5 if d != "1" else total >= 3, f"D{d}: {total}개"
+        for k in day["review"]:
+            assert k in all_new, f"D{d} 복습 {k}는 아직 안 배움"
+        all_new += day["new"]
+    assert len(set(all_new)) == 14              # dijkstra 제외 전 카타
+    assert len(plan["7"]["review"]) == 5        # 리허설 5개

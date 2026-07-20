@@ -39,10 +39,12 @@ class HomeScreen(Screen):
         self._sprint_plan = _json.loads(
             (_Path(__file__).parent.parent / "content/sprint.json").read_text(encoding="utf-8"))
         self._sprint = sprint
-        sprint_katas = []
+        sprint_new, sprint_review = [], []
         if sprint:
             d = str(min(sprint["day"], 7))
-            sprint_katas = self._sprint_plan["plan"][d]["katas"]
+            day_plan = self._sprint_plan["plan"][d]
+            sprint_new = day_plan.get("new", [])
+            sprint_review = day_plan.get("review", [])
 
         with Vertical(id="dash"):
             head = Text()
@@ -72,7 +74,12 @@ class HomeScreen(Screen):
             for kata in load_katas():
                 p = self._progress[kata.id]
                 c = p["counts"]
-                marker = "⚡ " if (self._sprint and kata.id in sprint_katas) else ""
+                marker = ""
+                if self._sprint:
+                    if kata.id in sprint_new:
+                        marker = "⚡ "
+                    elif kata.id in sprint_review:
+                        marker = "🔁 "
                 table.add_row(
                     marker + kata.title, kata.desc or kata.belt,
                     str(c["guided"]), str(c["cloze"]), str(c["recall"]),

@@ -1,13 +1,25 @@
 {
   "days": 7,
-  "note": "갑자기 코테가 잡혔을 때 — 하루 60~90분, 최빈출 유형만 압축. 하루 안에 보고→빈칸→재현까지 밀어붙인다.",
+  "note": "갑자기 코테가 잡혔을 때 — 하루 5카타(신규 2~3 + 전날 복습 2~3), 90~120분. 신규는 보고→빈칸→재현 당일 압축, 복습은 재현(r)만 빠르게.",
   "plan": {
-    "1": {"katas": ["py-parse", "sim-robot"], "focus": "어법 + 구현 (최빈출 1위)"},
-    "2": {"katas": ["topk-counter", "greedy-meetings"], "focus": "해시 + 그리디"},
-    "3": {"katas": ["stack-brackets", "heap-merge"], "focus": "스택 + 힙"},
-    "4": {"katas": ["bfs-grid", "dfs-islands"], "focus": "탐색 집중 (BFS·DFS — 최중요)"},
-    "5": {"katas": ["backtrack-subset", "string-compress"], "focus": "완전탐색 + 구현 심화"},
-    "6": {"katas": ["dp-kadane", "binary-cut"], "focus": "DP + 이분탐색"},
-    "7": {"katas": [], "focus": "최종 리허설 — 전 유형 재현(r) 랜덤 3개 + 실전 링크 1문제 직접 제출"}
+    "1": {"new": ["py-parse", "sim-robot", "topk-counter"], "review": [],
+          "focus": "어법 + 구현 + 해시 (신규 3)"},
+    "2": {"new": ["greedy-meetings", "stack-brackets"],
+          "review": ["sim-robot", "topk-counter", "py-parse"],
+          "focus": "그리디 + 스택 (신규 2 · 복습 3)"},
+    "3": {"new": ["heap-merge", "backtrack-subset"],
+          "review": ["greedy-meetings", "stack-brackets", "sim-robot"],
+          "focus": "힙 + 완전탐색 (신규 2 · 복습 3)"},
+    "4": {"new": ["bfs-grid", "dfs-islands"],
+          "review": ["backtrack-subset", "heap-merge", "topk-counter"],
+          "focus": "탐색 집중 BFS·DFS (신규 2 · 복습 3)"},
+    "5": {"new": ["string-compress", "dp-kadane"],
+          "review": ["bfs-grid", "dfs-islands", "greedy-meetings"],
+          "focus": "구현 심화 + DP (신규 2 · 복습 3)"},
+    "6": {"new": ["dp-grid", "binary-cut", "twopointer-pairs"],
+          "review": ["dp-kadane", "bfs-grid"],
+          "focus": "DP 2차원 + 이분탐색·투포인터 (신규 3 · 복습 2)"},
+    "7": {"new": [], "review": ["bfs-grid", "sim-robot", "dp-kadane", "backtrack-subset", "stack-brackets"],
+          "focus": "최종 리허설 — 핵심 5개 재현(r) 연속 + 실전 링크 1문제 직접 제출"}
   }
 }
