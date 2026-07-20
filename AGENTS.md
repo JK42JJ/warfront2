@@ -36,6 +36,17 @@ wf/content/curriculum.yaml   50일 배치 / sprint.json 7일 속성 배치
 docs/DESIGN.md           설계 근거(리서치 기반) / docs/SOURCES.md 콘텐츠 출처 원장
 ```
 
+## 지식그래프 (graphify — 위 지도의 심화판)
+
+`graphify-out/`에 코드+문서+스크린샷을 통합한 지식그래프가 커밋되어 있다 (326 노드 · 22 커뮤니티).
+
+- `graphify-out/wiki/index.md` — 에이전트용 위키 입구. 커뮤니티별 아티클로 구조를 훑는다.
+- `graphify-out/graph.json` — 질의용 그래프. `/graphify query "질문"` / `graphify path "A" "B"` / `graphify explain "노드"`.
+- `graphify-out/GRAPH_REPORT.md` — 핵심 노드(god nodes)·이상 연결·감사 리포트.
+
+코드가 바뀌면 `graphify update .` (AST만, LLM 불필요)로 재생성해 함께 커밋한다.
+문서·이미지가 바뀌면 `/graphify . --update`. 캐시(`graphify-out/cache/`)는 repo 밖.
+
 ## 불변식 (어기면 안 되는 것)
 
 1. **콘텐츠는 출처 필수.** 문제 유형·인식 문항을 추측으로 창작하지 않는다.
