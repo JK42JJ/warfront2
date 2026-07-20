@@ -36,7 +36,7 @@ class HomeScreen(Screen):
         with Vertical(id="dash"):
             head = Text()
             head.append("⚔ WARFRONT 2", style="bold cyan")
-            head.append("   생각 먼저, 구현은 그 다음. 50일 코테 합격 훈련", style="dim")
+            head.append("   50일 코딩테스트 훈련", style="dim")
             yield Static(head, id="dash-head")
             with Horizontal(id="dash-top"):
                 with Vertical(classes="dash-metric"):

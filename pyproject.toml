@@ -1,7 +1,7 @@
 [project]
 name = "warfront2"
 version = "0.1.0"
-description = "WARFRONT 2 — 50일 코딩테스트 합격 CLI 훈련기 (Think-First · 타건감 · FSRS 반복)"
+description = "터미널 코딩테스트 훈련 도구 — 50일 과정"
 requires-python = ">=3.10"
 dependencies = [
     "textual[syntax]>=8.0",
