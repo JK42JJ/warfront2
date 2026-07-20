@@ -19,6 +19,7 @@ from textual.widgets import Digits, Footer, Input, Static
 
 from wf.content.loader import Kata
 from wf.engine.typing_engine import TypingSession
+from wf.widgets import DiagramPanel
 from wf.store import db
 
 # 글자 상태 색 (타건감의 시각 언어)
@@ -34,6 +35,7 @@ class KataScreen(Screen):
     BINDINGS = [
         ("escape", "back", "홈으로"),
         ("f1", "hint", "힌트(단계)"),
+        ("f2", "diagram", "개념도"),
     ]
 
     def __init__(self, kata: Kata, mode: str = "guided") -> None:
@@ -77,6 +79,7 @@ class KataScreen(Screen):
             with Vertical(id="type-box", classes="hidden"):
                 yield Static(id="code-display")
                 yield Static(id="hint-panel", classes="hidden")
+                yield DiagramPanel(id="diagram-panel", classes="hidden")
                 with Horizontal(id="stats"):
                     yield Digits("0", id="wpm-digits")
                     yield Static("타속 WPM", classes="stat-label")
@@ -130,6 +133,11 @@ class KataScreen(Screen):
             text.append("\n📝 현재 줄: ", style="bold cyan")
             text.append(note if note else "(이 줄 설명 없음)")
         panel.update(text)
+
+    def action_diagram(self) -> None:
+        if self.phase not in ("type", "code"):
+            return
+        self.query_one("#diagram-panel", DiagramPanel).toggle(self.kata.diagram)
 
     def _current_line(self) -> int:
         return self.kata.code[: self.session.pos].count("\n")

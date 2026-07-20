@@ -132,5 +132,12 @@
   "perf": {
     "gen": "def make_args():\n    words = [f'w{i % 5000}' for i in range(200000)]\n    return (words, 10)",
     "time_limit": 2.0
+  },
+  "diagram": {
+    "caption": "빈도 집계 → 힙 선별 — 전체 정렬(N log N) 대신 힙 크기 K 유지(N log K)",
+    "fps": 0,
+    "frames": [
+      "words = [a, b, a, c, a, b, ...]          N개\n   │\n   ▼  Counter(words)                     O(N)\n{ a:3, b:2, c:1, ... }                   해시(빈도표)\n   │\n   ▼  heapq.nsmallest(k, key=(-빈도, 이름))   O(N log K)\n[ (a,3), (b,2) ]                         상위 K만\n\n✗ 전체 정렬 sorted(...)  = O(N log N)  ← K≪N이면 낭비\n✓ 힙 크기 K 유지         = O(N log K)  ← 이게 기대 복잡도"
+    ]
   }
 }

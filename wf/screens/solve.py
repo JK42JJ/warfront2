@@ -21,6 +21,7 @@ from textual.widgets import Footer, Input, Static, TextArea
 
 from wf.content.loader import Kata
 from wf.store import db
+from wf.widgets import DiagramPanel
 
 MODE_KO = {"recall": "안 보고 재현", "solve": "스스로 구현"}
 
@@ -37,6 +38,7 @@ class SolveScreen(Screen):
     BINDINGS = [
         Binding("ctrl+r", "grade", "채점 실행", priority=True),
         Binding("f1", "hint", "힌트(서브골)", priority=True),
+        Binding("f2", "diagram", "개념도", priority=True),
         Binding("escape", "back", "홈으로", priority=True),
     ]
 
@@ -75,6 +77,7 @@ class SolveScreen(Screen):
                 yield TextArea.code_editor(starter_code(self.kata),
                                            language="python", id="editor")
                 yield Static(id="hint-panel", classes="hidden")
+                yield DiagramPanel(id="diagram-panel", classes="hidden")
                 yield Static(id="grade-panel", classes="hidden")
         yield Footer()
 
@@ -113,6 +116,11 @@ class SolveScreen(Screen):
         else:
             self.hint_level = 0
             panel.add_class("hidden")
+
+    def action_diagram(self) -> None:
+        if self.phase not in ("type", "code"):
+            return
+        self.query_one("#diagram-panel", DiagramPanel).toggle(self.kata.diagram)
 
     # ---------- 채점 (Ctrl+R) ----------
     def action_grade(self) -> None:

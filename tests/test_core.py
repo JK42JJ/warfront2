@@ -366,3 +366,27 @@ async def test_solve_screen_pass_records(tmp_path, monkeypatch):
         conn = db.connect()
         assert db.kata_progress(conn, "topk-counter")["counts"]["recall"] == 1
         conn.close()
+
+
+@pytest.mark.asyncio
+async def test_diagram_panel_f2(tmp_path, monkeypatch):
+    """F2 개념도: BFS 애니메이션 프레임 표시/숨김 토글."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.widgets import DiagramPanel
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        await pilot.press("g")             # 보고 모드
+        await pilot.pause()
+        screen = app.screen
+        for ch in "큐로 층별 확장":
+            await pilot.press(ch if ch != " " else "space")
+        await pilot.press("enter")
+        await pilot.pause()
+        panel = screen.query_one("#diagram-panel", DiagramPanel)
+        assert "hidden" in panel.classes
+        await pilot.press("f2")
+        assert "hidden" not in panel.classes
+        assert len(panel._frames) == 5     # BFS 파도 5프레임
+        await pilot.press("f2")
+        assert "hidden" in panel.classes

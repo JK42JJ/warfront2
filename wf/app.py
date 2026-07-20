@@ -23,6 +23,7 @@ class WarfrontApp(App):
     #kata-table { height: auto; max-height: 20; margin-bottom: 1; }
     #dash-help { height: auto; color: $text-muted; text-align: center; width: 100%; }
     #hint-panel { height: auto; border: tall $success; padding: 1 2; margin-top: 1; }
+    #diagram-panel { height: auto; border: tall $accent; padding: 1 2; margin-top: 1; }
 
     /* ---- 카타 ----
        주의: Vertical/Horizontal 기본 height는 1fr(화면 채움) — auto로 강제하지
