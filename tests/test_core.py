@@ -505,3 +505,23 @@ def test_sprint_plan_volume_and_coverage():
         all_new += day["new"]
     assert len(set(all_new)) == 14              # dijkstra 제외 전 카타
     assert len(plan["7"]["review"]) == 5        # 리허설 5개
+
+
+def test_recognition_bank_sourced():
+    """콘텐츠 규칙: 인식 뱅크 전 문항은 검증된 기출 출처(URL)를 가져야 한다 (추측 금지)."""
+    import json
+    from pathlib import Path
+    bank = json.loads(Path("wf/content/recognition.json").read_text(encoding="utf-8"))
+    types = set(bank["types"])
+    assert "SOURCED" in bank["_meta"]["status"]
+    assert len(bank["items"]) >= 40
+    for it in bank["items"]:
+        assert it["answer"] in types and it["trap"] in types
+        assert it["trap"] != it["answer"]
+        assert it["source"]["url"].startswith("http"), it["id"]
+        assert it["source"]["name"], it["id"]
+    # 함정 페어 핵심(경계 학습)이 존재하는가
+    pairs = {(i["answer"], i["trap"]) for i in bank["items"]}
+    assert ("bfs", "dijkstra") in pairs      # 가중치 유무 경계
+    assert ("greedy", "dp") in pairs          # 교환논증 성립 경계
+    assert ("dfs", "bfs") in pairs            # 최단 필요 여부 경계

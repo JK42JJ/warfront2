@@ -1,4 +1,8 @@
 {
+ "_meta": {
+  "status": "SOURCED — 2026-07-20 리서치 앵커링 완료. 전 문항 출처 명시 (docs/SOURCES.md)",
+  "note": "지문은 기출의 요지 재서술(저작권상 원문 복제 금지). 백준 링크는 서비스 중단(2026-04-28~) 상태 — 문제명 앵커로 유지, 훈련 링크는 프로그래머스/HackerRank 우선"
+ },
  "types": {
   "implementation": "구현/시뮬레이션",
   "hash": "해시",
@@ -16,402 +20,621 @@
  "items": [
   {
    "id": "r001",
-   "text": "감염된 서버에서 매 시간 인접 서버로 바이러스가 동시에 퍼진다. 전체 감염까지 최소 몇 시간 걸리는가?",
+   "text": "창고 곳곳의 상한 과일이 매일 인접 과일을 동시에 상하게 한다. 전부 상할 때까지 최소 며칠? 불가능하면 -1.",
    "answer": "bfs",
-   "signals": "동시에 퍼짐 + 최소 시간 = 층 확장",
+   "signals": "여러 시작점 + 동시 확산 + 최소 일수 = 다중 시작 BFS",
    "trap": "dfs",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 7576 토마토 (골드5, 재서술)",
+    "url": "https://www.acmicpc.net/problem/7576"
+   }
   },
   {
    "id": "r002",
-   "text": "던전 격자에서 벽을 피해 출구까지 가는 최소 이동 횟수는? 모든 이동 비용은 같다.",
+   "text": "게임 맵에서 캐릭터가 상대 진영까지 벽을 피해 도달하는 최소 이동 칸 수는? 모든 이동 비용은 같다.",
    "answer": "bfs",
-   "signals": "가중치 없는 최단 = BFS (비용이 다르면 다익스트라)",
+   "signals": "가중치 없는 최단 = BFS (비용 다르면 다익스트라)",
    "trap": "dijkstra",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 게임 맵 최단거리 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/1844"
+   }
   },
   {
    "id": "r003",
-   "text": "A의 친구, 친구의 친구… A에서 B까지 최소 몇 단계 만에 연결되는가?",
+   "text": "단어를 한 글자씩 바꿔 목표 단어로 — 사전에 있는 단어만 거쳐 최소 몇 번 변환?",
    "answer": "bfs",
-   "signals": "관계 그래프의 최소 단계 = 가중치 없는 최단",
+   "signals": "상태(단어) 그래프의 최소 변환 횟수 = 층 확장",
    "trap": "dfs",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 단어 변환 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/43163"
+   }
   },
   {
    "id": "r004",
-   "text": "여러 소방서에서 동시에 출동한다. 모든 집에 소방차가 도달하는 최소 시간은?",
+   "text": "수직선에서 걷기(±1, 1초)와 순간이동(×2, 0초)으로 동생 위치까지 가장 빠른 시간은?",
    "answer": "bfs",
-   "signals": "시작점 여러 개 + 최소 시간 = 다중 시작 BFS",
+   "signals": "이동 비용이 0/1 두 종류 = 0-1 BFS(덱) — 상태 확장 신호",
    "trap": "dijkstra",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 13549 숨바꼭질 3 (골드5, 재서술)",
+    "url": "https://www.acmicpc.net/problem/13549"
+   }
   },
   {
    "id": "r005",
-   "text": "0/1 미로 최단 경로. 단, 벽을 딱 1개까지 부술 수 있다.",
+   "text": "바이러스가 파이프망을 따라 시간당 한 칸씩 번진다. 각 시점의 감염 범위를 시뮬레이션하며 목표 지점 도달 시간을 구하라.",
    "answer": "bfs",
-   "signals": "최단 + 추가 조건 = 상태를 (위치, 벽부순횟수)로 확장한 BFS",
-   "trap": "backtracking",
-   "also_ok": []
+   "signals": "확산 시뮬레이션 = BFS 층 전개 (카카오 최신 기출 유형)",
+   "trap": "implementation",
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2026 공채 1차 4번 — 바이러스 파이프 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/813"
+   }
   },
   {
    "id": "r006",
-   "text": "지도에서 서로 붙어 있는 영토 덩어리가 총 몇 개인지 세라.",
+   "text": "아파트 단지 지도(0/1)에서 붙어 있는 집들의 단지 수와 각 단지의 집 수를 구하라.",
    "answer": "dfs",
-   "signals": "연결 요소 '개수' — 최단 불필요, 전부 방문만 하면 됨",
+   "signals": "연결 요소 세기 — 최단 불필요, 전부 방문이면 충분",
    "trap": "bfs",
    "also_ok": [
     "bfs"
-   ]
+   ],
+   "source": {
+    "name": "백준 2667 단지번호붙이기 (실버1, 재서술)",
+    "url": "https://www.acmicpc.net/problem/2667"
+   }
   },
   {
    "id": "r007",
-   "text": "미로에서 출구까지 가는 길이 존재하는지만 판정하라(길이는 무관).",
+   "text": "컴퓨터 1번이 웜에 감염됐다. 네트워크로 연결돼 함께 감염되는 컴퓨터 수는?",
    "answer": "dfs",
-   "signals": "존재 여부만 = 아무 탐색. 최단 아님에 주의",
+   "signals": "도달 가능한 정점 집합 = 아무 탐색",
    "trap": "bfs",
    "also_ok": [
     "bfs"
-   ]
+   ],
+   "source": {
+    "name": "백준 2606 바이러스 (실버, 재서술)",
+    "url": "https://www.acmicpc.net/problem/2606"
+   }
   },
   {
    "id": "r008",
-   "text": "조직도에서 어떤 직원 아래에 있는 전체 부하 직원 수를 구하라.",
+   "text": "숫자 배열의 각 수에 +나 -를 붙여 target을 만드는 방법의 수는?",
    "answer": "dfs",
-   "signals": "트리 하위 전체 집계 = 재귀 탐색",
-   "trap": "bfs",
+   "signals": "각 원소 2지선다 트리 전수 — DFS/백트래킹 경계",
+   "trap": "backtracking",
    "also_ok": [
-    "bfs"
-   ]
+    "backtracking"
+   ],
+   "source": {
+    "name": "프로그래머스 Kit — 타겟 넘버 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/43165"
+   }
   },
   {
    "id": "r009",
-   "text": "프로젝트 의존 관계에 순환(서로 물고 있는 고리)이 있는지 판정하라.",
+   "text": "친구 관계에서 A-B-C-D-E처럼 5명이 연쇄로 이어진 사슬이 존재하는가?",
    "answer": "dfs",
-   "signals": "사이클 탐지 = 방문 상태 3색 DFS",
+   "signals": "깊이 5 경로 존재 = 깊이 우선이 정확히 맞는 문제",
    "trap": "bfs",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 13023 ABCDE (골드5, 재서술)",
+    "url": "https://www.acmicpc.net/problem/13023"
+   }
   },
   {
    "id": "r010",
-   "text": "로봇이 명령 문자열(전진/좌회전/우회전)대로 움직인다. 최종 위치와 방향은?",
+   "text": "로봇 청소기가 규칙(청소→회전→후진)대로 움직인다. 청소하는 칸 수는?",
    "answer": "implementation",
-   "signals": "조건을 그대로 옮기는 상태 전이 — 알고리즘보다 꼼꼼함",
+   "signals": "명시된 규칙의 정확한 상태 전이 — 삼성 1번 유형",
    "trap": "backtracking",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 14503 로봇 청소기 (골드5, 삼성 기출)",
+    "url": "https://www.acmicpc.net/problem/14503"
+   }
   },
   {
    "id": "r011",
-   "text": "n×n 판을 나선(달팽이) 순서로 채워라.",
+   "text": "사회자가 수를 부를 때마다 빙고판에서 지운다. 3줄 빙고가 되는 순간은 몇 번째 수인가?",
    "answer": "implementation",
-   "signals": "방향 전환 규칙의 정확한 구현",
-   "trap": "dp",
-   "also_ok": []
+   "signals": "판 상태 갱신 + 조건 검사 반복",
+   "trap": "hash",
+   "also_ok": [],
+   "source": {
+    "name": "백준 2578 빙고 (실버4, 재서술)",
+    "url": "https://www.acmicpc.net/problem/2578"
+   }
   },
   {
    "id": "r012",
-   "text": "주차장 입출차 기록으로 차량별 요금을 계산하라(기본요금+초과 단위요금).",
+   "text": "주차장 입출차 기록으로 차량별 요금(기본+초과 단위 올림)을 계산하라.",
    "answer": "implementation",
-   "signals": "파싱 + 규칙 적용 — 카카오형 구현",
+   "signals": "기록 파싱 + 규칙 적용 — 카카오형 구현",
    "trap": "hash",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2022 블라인드 — 주차 요금 계산 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/488"
+   }
   },
   {
    "id": "r013",
-   "text": "시계 방향으로 90도 회전한 격자를 만들어라.",
+   "text": "게시글에서 특정 규칙에 해당하는 단어만 마스킹해 출력하라 (문자열 파싱).",
    "answer": "implementation",
-   "signals": "좌표 변환 규칙 (r,c)→(c, n-1-r)",
-   "trap": "dp",
-   "also_ok": []
+   "signals": "문자열 파싱형 — 2026 카카오 1번 유형(최신 트렌드)",
+   "trap": "stack",
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2026 공채 1차 1번 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/813"
+   }
   },
   {
    "id": "r014",
-   "text": "문자열에서 연속된 같은 문자를 '문자+개수'로 압축하라.",
+   "text": "톱니바퀴 4개가 맞물려 회전 규칙에 따라 돈다. 명령 수행 후 상태는?",
    "answer": "implementation",
-   "signals": "상태(직전 문자, 연속 길이) 추적 순회",
-   "trap": "stack",
-   "also_ok": []
+   "signals": "연쇄 조건의 정밀 시뮬레이션 — 삼성 단골",
+   "trap": "backtracking",
+   "also_ok": [],
+   "source": {
+    "name": "백준 14891 톱니바퀴 (골드5, 삼성 기출)",
+    "url": "https://www.acmicpc.net/problem/14891"
+   }
   },
   {
    "id": "r015",
-   "text": "수강 신청자 명단과 완주자 명단이 있다. 완주하지 못한 단 한 명은 누구인가?",
+   "text": "마라톤 참가자 명단과 완주자 명단 — 완주하지 못한 단 한 명은? (동명이인 존재)",
    "answer": "hash",
-   "signals": "이름→횟수 집계 후 차이 — 동명이인 주의",
+   "signals": "이름→횟수 집계 후 차이. 동명이인 = set 아닌 counter 신호",
    "trap": "two_pointer",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 완주하지 못한 선수 (Lv1)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42576"
+   }
   },
   {
    "id": "r016",
-   "text": "두 배열에서 공통으로 등장하는 원소의 개수는?",
+   "text": "폰켓몬 N마리 중 N/2마리를 고를 때 서로 다른 종류 수의 최댓값은?",
    "answer": "hash",
-   "signals": "한쪽을 set으로 → O(1) 존재 확인",
-   "trap": "two_pointer",
-   "also_ok": []
+   "signals": "종류 수 = set 크기와 N/2의 min",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 폰켓몬 (Lv1)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/1845"
+   }
   },
   {
    "id": "r017",
-   "text": "로그에서 가장 자주 등장한 에러 메시지 상위 3개는?",
+   "text": "장르별 총 재생수 순으로, 각 장르에서 가장 많이 재생된 노래 2곡씩 뽑아라.",
    "answer": "hash",
-   "signals": "빈도 집계(dict) + 상위 K(힙)",
+   "signals": "집계(장르→합계) + 그룹 내 상위 K — 해시 다단 집계",
    "trap": "heap",
    "also_ok": [
     "heap"
-   ]
+   ],
+   "source": {
+    "name": "프로그래머스 Kit — 베스트앨범 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42579"
+   }
   },
   {
    "id": "r018",
-   "text": "옷 종류별 가짓수가 주어질 때 서로 다른 조합의 수는? (종류별 최대 1개 착용)",
+   "text": "의상 종류별 가짓수가 주어질 때 입을 수 있는 서로 다른 조합 수는? (종류별 0~1개, 최소 1개)",
    "answer": "hash",
-   "signals": "종류별 집계 후 (개수+1) 곱 - 1",
+   "signals": "종류별 집계 후 (개수+1) 곱 − 1",
    "trap": "backtracking",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 의상 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42578"
+   }
   },
   {
    "id": "r019",
-   "text": "회의 시작·종료 시각 목록에서 겹치지 않게 최대 몇 개의 회의를 배정할 수 있나?",
-   "answer": "greedy",
-   "signals": "끝나는 시간 정렬 + 교환 논증 — 매 순간 최선이 전체 최선",
-   "trap": "dp",
-   "also_ok": []
+   "text": "유저들이 서로 신고(중복 무시). k회 이상 신고당하면 정지 — 각 유저가 받을 알림 수는?",
+   "answer": "hash",
+   "signals": "set 중복 제거 + dict 집계 2단",
+   "trap": "implementation",
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2022 블라인드 1번 — 신고 결과 받기 (공식 해설, 정답률 80%)",
+    "url": "https://tech.kakao.com/posts/488"
+   }
   },
   {
    "id": "r020",
-   "text": "거스름돈을 500/100/50/10원 동전으로 줄 때 동전 개수의 최솟값은?",
+   "text": "고속도로 감시 구간들이 주어질 때, 모든 구간을 만나도록 설치할 카메라의 최소 대수는?",
    "answer": "greedy",
-   "signals": "화폐가 배수 관계면 큰 것부터 그리디 (아니면 DP!)",
+   "signals": "구간 끝점 정렬 + 교환 논증 — 끝나는 지점이 기준",
    "trap": "dp",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 단속카메라 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42884"
+   }
   },
   {
    "id": "r021",
-   "text": "숫자 문자열에서 k개를 지워 만들 수 있는 가장 큰 수는?",
+   "text": "거스름돈을 500/100/50/10원 동전으로 줄 때 동전 개수 최소는?",
    "answer": "greedy",
-   "signals": "앞자리가 클수록 유리 — 단조 스택으로 구현하는 그리디",
-   "trap": "stack",
-   "also_ok": [
-    "stack"
-   ]
+   "signals": "화폐가 배수 관계 = 큰 것부터 그리디 (임의 화폐면 DP!)",
+   "trap": "dp",
+   "also_ok": [],
+   "source": {
+    "name": "백준 11047 동전 0 (실버4, 재서술)",
+    "url": "https://www.acmicpc.net/problem/11047"
+   }
   },
   {
    "id": "r022",
-   "text": "1인당 최대 2명, 무게 제한이 있는 보트로 전원을 태우는 최소 보트 수는?",
+   "text": "숫자 문자열에서 k개를 지워 만들 수 있는 가장 큰 수는?",
    "answer": "greedy",
-   "signals": "정렬 후 최무거움+최가벼움 짝 — 그리디+투포인터",
-   "trap": "two_pointer",
+   "signals": "앞자리 최대화 — 단조 스택으로 구현하는 그리디",
+   "trap": "stack",
    "also_ok": [
-    "two_pointer"
-   ]
+    "stack"
+   ],
+   "source": {
+    "name": "프로그래머스 Kit — 큰 수 만들기 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42883"
+   }
   },
   {
    "id": "r023",
-   "text": "여러 종류 괄호로 된 수식이 올바르게 짝지어졌는지 판정하라.",
-   "answer": "stack",
-   "signals": "가장 최근에 연 것이 먼저 닫혀야 = LIFO",
-   "trap": "implementation",
-   "also_ok": []
+   "text": "보트당 최대 2명·무게 제한으로 전원을 구조하는 최소 보트 수는?",
+   "answer": "greedy",
+   "signals": "정렬 후 최무거움+최가벼움 짝짓기 — 그리디+투포인터",
+   "trap": "two_pointer",
+   "also_ok": [
+    "two_pointer"
+   ],
+   "source": {
+    "name": "프로그래머스 Kit — 구명보트 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42885"
+   }
   },
   {
    "id": "r024",
-   "text": "문서 편집기의 실행 취소(undo)를 구현하라.",
+   "text": "괄호 문자열이 올바르게 짝지어졌는지 판정하라.",
    "answer": "stack",
-   "signals": "최근 작업부터 되돌림 = LIFO",
-   "trap": "heap",
-   "also_ok": []
+   "signals": "가장 최근에 연 것이 먼저 닫힘 = LIFO",
+   "trap": "implementation",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 올바른 괄호 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/12909"
+   }
   },
   {
    "id": "r025",
-   "text": "각 원소에 대해 오른쪽에서 처음으로 더 큰 수를 찾아라.",
+   "text": "1~n을 오름차순으로 push하며, 주어진 수열을 pop 순서로 만들 수 있는가?",
    "answer": "stack",
-   "signals": "오큰수 = 단조 감소 스택",
-   "trap": "two_pointer",
-   "also_ok": []
+   "signals": "push/pop 순서 재구성 — 스택 동작 자체가 문제",
+   "trap": "implementation",
+   "also_ok": [],
+   "source": {
+    "name": "백준 1874 스택 수열 (실버2, 재서술)",
+    "url": "https://www.acmicpc.net/problem/1874"
+   }
   },
   {
    "id": "r026",
-   "text": "오늘 이하 가격이 연속된 날 수(주가 스팬)를 각 날마다 구하라.",
+   "text": "히스토그램(막대 높이 배열)에서 만들 수 있는 가장 큰 직사각형 넓이는?",
    "answer": "stack",
-   "signals": "직전의 작은 값들을 한 번에 삼키는 단조 스택",
+   "signals": "내 높이보다 낮은 게 나올 때까지 확장 = 단조 스택",
    "trap": "dp",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "HackerRank IPK — Largest Rectangle",
+    "url": "https://www.hackerrank.com/challenges/largest-rectangle/problem"
+   }
   },
   {
    "id": "r027",
-   "text": "응급실 환자가 수시로 도착한다. 항상 가장 위급한 환자부터 진료해야 한다.",
-   "answer": "heap",
-   "signals": "동적 삽입 + 매번 최우선 꺼내기 = 우선순위 큐",
-   "trap": "greedy",
-   "also_ok": []
+   "text": "각 날의 주가에 대해 '가격이 떨어지지 않은 기간'을 구하라.",
+   "answer": "stack",
+   "signals": "직전의 작은 값들을 한 번에 처리 — 단조 스택 스팬",
+   "trap": "dp",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 주식가격 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42584"
+   }
   },
   {
    "id": "r028",
-   "text": "카드 묶음을 매번 두 개 골라 합친다. 비용은 두 묶음 합. 총비용 최소는?",
+   "text": "작업 요청이 수시로 들어온다. 매번 소요시간이 가장 짧은 작업부터 처리해 평균 대기시간을 최소화하라.",
    "answer": "heap",
-   "signals": "매번 '현재 최소 2개' 선택 — 힙이 O(log N) 제공",
+   "signals": "동적 삽입 + 매번 최솟값 = 우선순위 큐(SJF)",
    "trap": "greedy",
    "also_ok": [
     "greedy"
-   ]
+   ],
+   "source": {
+    "name": "프로그래머스 Kit — 디스크 컨트롤러 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42627"
+   }
   },
   {
    "id": "r029",
-   "text": "숫자 스트림에서 매 시점 가장 작은 값 k개를 유지하라.",
+   "text": "스코빌 지수가 가장 낮은 두 음식을 섞기를 반복해 전부 K 이상으로 — 최소 섞는 횟수는?",
    "answer": "heap",
-   "signals": "크기 k 힙 유지 = O(N log K)",
-   "trap": "binary_search",
-   "also_ok": []
+   "signals": "매번 '현재 최소 2개' = 최소 힙",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 더 맵게 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42626"
+   }
   },
   {
    "id": "r030",
-   "text": "서로 공격하지 않게 n×n 체스판에 퀸 n개를 배치하는 경우의 수는?",
-   "answer": "backtracking",
-   "signals": "배치 시도 + 조건 위반 시 되돌아감(가지치기)",
-   "trap": "dp",
-   "also_ok": []
+   "text": "연산 스트림(삽입/최댓값 삭제/최솟값 삭제)을 처리한 뒤 남은 최대·최소를 구하라.",
+   "answer": "heap",
+   "signals": "양방향 우선순위 = 이중 힙(min+max)",
+   "trap": "stack",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 이중우선순위큐 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42628"
+   }
   },
   {
    "id": "r031",
-   "text": "1~n에서 m개를 뽑는 모든 순열을 사전순으로 출력하라.",
+   "text": "던전마다 (필요 피로도, 소모 피로도)가 있다. 순서를 정해 최대 몇 개를 탐험할 수 있나? (던전 ≤ 8)",
    "answer": "backtracking",
-   "signals": "모든 경우 생성 = 재귀 트리 전수 방문",
-   "trap": "implementation",
-   "also_ok": []
+   "signals": "N ≤ 8 = 순서 전수 시도 초대장",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 피로도 (Lv2)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/87946"
+   }
   },
   {
    "id": "r032",
-   "text": "부분집합 중 합이 정확히 target이 되는 개수는? (원소 20개 이하)",
+   "text": "1~n에서 m개를 뽑는 모든 수열을 사전순으로 생성하라.",
    "answer": "backtracking",
-   "signals": "N이 작다(≤20) = 2^N 전수 탐색 허용 신호",
-   "trap": "dp",
-   "also_ok": []
+   "signals": "재귀 트리 전수 생성의 원형",
+   "trap": "implementation",
+   "also_ok": [],
+   "source": {
+    "name": "백준 15649 N과 M(1) (실버3, 재서술)",
+    "url": "https://www.acmicpc.net/problem/15649"
+   }
   },
   {
    "id": "r033",
-   "text": "전선 배치 조합을 모두 시도해 조건을 만족하는 최소 제거 수를 찾아라. 입력이 매우 작다.",
+   "text": "N개(≤20) 정수 부분수열 중 합이 S가 되는 경우의 수는?",
    "answer": "backtracking",
-   "signals": "'입력이 작다' = 완전탐색 초대장",
-   "trap": "greedy",
-   "also_ok": []
+   "signals": "N ≤ 20 = 2^N 전수 탐색 허용",
+   "trap": "dp",
+   "also_ok": [],
+   "source": {
+    "name": "백준 1182 부분수열의 합 (실버2)",
+    "url": "https://www.acmicpc.net/problem/1182"
+   }
   },
   {
    "id": "r034",
-   "text": "계단을 1칸 또는 2칸씩 오른다. n층까지 오르는 방법의 수는?",
-   "answer": "dp",
-   "signals": "경우의 수 + 이전 상태(n-1, n-2)로 정의됨 = 점화식",
-   "trap": "backtracking",
-   "also_ok": []
+   "text": "화살 10발을 과녁 점수판에 배분하는 모든 경우를 시도해 최대 점수차 배분을 찾아라.",
+   "answer": "backtracking",
+   "signals": "작은 입력의 배분 조합 전수 — 카카오 공식 완전탐색",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2022 블라인드 4번 — 양궁 대회 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/488"
+   }
   },
   {
    "id": "r035",
-   "text": "정수 배열에서 연속 부분 배열 합의 최댓값은? (음수 포함)",
-   "answer": "dp",
-   "signals": "음수 때문에 그리디 불가 — '잇기 vs 새출발' 점화식(카데인)",
+   "text": "이모티콘 할인율(4종 중 택1)을 조합해 목표를 최대화 — 이모티콘 ≤ 7개.",
+   "answer": "backtracking",
+   "signals": "4^7 전수 = '경우의 수가 수만'이면 완전탐색",
    "trap": "greedy",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2023 블라인드 3번 — 이모티콘 할인행사 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/567"
+   }
   },
   {
    "id": "r036",
-   "text": "무게 제한 배낭에 물건을 담아 가치 합 최대. 물건은 자를 수 없다.",
+   "text": "계단을 한 번에 1~2칸, 연속 3칸 금지 규칙으로 오르며 밟은 계단 점수 합의 최댓값은?",
    "answer": "dp",
-   "signals": "0/1 선택 + 부분 문제 겹침 = DP (자를 수 있으면 그리디)",
+   "signals": "이전 선택(연속 여부)이 다음을 제약 = 상태 있는 점화식",
    "trap": "greedy",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 2579 계단 오르기 (실버3)",
+    "url": "https://www.acmicpc.net/problem/2579"
+   }
   },
   {
    "id": "r037",
-   "text": "삼각형 꼭대기에서 바닥까지 인접 칸으로만 내려갈 때 합의 최대는?",
+   "text": "이웃한 두 집을 털면 경보가 울린다. 원형으로 늘어선 집들에서 훔칠 수 있는 최대 금액은?",
    "answer": "dp",
-   "signals": "위 두 칸에서만 옴 = 격자형 점화식",
+   "signals": "인접 배제 최대합 — 잇기/건너뛰기 점화식",
    "trap": "greedy",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 도둑질 (Lv4)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42897"
+   }
   },
   {
    "id": "r038",
-   "text": "두 문자열이 있을 때 공통 부분 수열의 최대 길이는?",
+   "text": "삼각형 꼭대기에서 바닥까지 인접 칸으로 내려가며 합의 최댓값을 구하라.",
    "answer": "dp",
-   "signals": "2차원 상태(i,j) + 겹치는 부분 문제 = LCS",
-   "trap": "two_pointer",
-   "also_ok": []
+   "signals": "위 두 칸에서만 도달 = 격자형 점화식",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 정수 삼각형 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/43105"
+   }
   },
   {
    "id": "r039",
-   "text": "정렬된 배열에서 값 x가 존재하는지 O(log N)으로 판정하라.",
-   "answer": "binary_search",
-   "signals": "정렬 + 존재 확인 = 교과서 이분탐색",
-   "trap": "hash",
-   "also_ok": []
+   "text": "두 문자열의 공통 부분 수열 중 가장 긴 것의 길이는?",
+   "answer": "dp",
+   "signals": "2차원 상태(i,j) + 부분 문제 겹침 = LCS",
+   "trap": "two_pointer",
+   "also_ok": [],
+   "source": {
+    "name": "HackerRank IPK — Common Child (LCS)",
+    "url": "https://www.hackerrank.com/challenges/common-child/problem"
+   }
   },
   {
    "id": "r040",
-   "text": "랜선 n개를 잘라 길이 같은 k개를 만들 때 최대 길이는?",
-   "answer": "binary_search",
-   "signals": "'길이 x로 되나?'가 단조 — 답을 이분탐색(파라메트릭)",
-   "trap": "greedy",
-   "also_ok": []
+   "text": "집 앞 격자에서 웅덩이를 피해 학교까지 가는 경로의 수는? (우/하 이동만)",
+   "answer": "dp",
+   "signals": "경로의 수 + 좌상단에서만 도달 = 격자 카운팅 DP",
+   "trap": "backtracking",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 등굣길 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/42898"
+   }
   },
   {
    "id": "r041",
-   "text": "심사관 처리 시간이 제각각일 때 모든 사람이 심사받는 최소 시간은?",
+   "text": "숫자 카드 N개를 갖고 있는지, 주어진 M개 각각에 대해 판정하라 (N, M ≤ 50만).",
    "answer": "binary_search",
-   "signals": "'시간 T에 다 되나?' 단조 판정 = 파라메트릭",
-   "trap": "heap",
-   "also_ok": []
+   "signals": "정렬 + 반복 존재 판정 = 이분탐색(또는 set)",
+   "trap": "hash",
+   "also_ok": [
+    "hash"
+   ],
+   "source": {
+    "name": "백준 10815 숫자 카드 (실버5, 재서술)",
+    "url": "https://www.acmicpc.net/problem/10815"
+   }
   },
   {
    "id": "r042",
-   "text": "정렬된 배열에서 값 x가 처음 등장하는 위치를 찾아라.",
+   "text": "랜선 n개를 잘라 같은 길이 k개를 만들 때 가능한 최대 길이는?",
    "answer": "binary_search",
-   "signals": "경계 찾기 = lower bound",
-   "trap": "two_pointer",
-   "also_ok": []
+   "signals": "'길이 x로 되나?'가 단조 = 답을 이분탐색(파라메트릭)",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "백준 1654 랜선 자르기 (실버2)",
+    "url": "https://www.acmicpc.net/problem/1654"
+   }
   },
   {
    "id": "r043",
-   "text": "정렬된 배열에서 합이 정확히 target인 쌍의 개수는?",
-   "answer": "two_pointer",
-   "signals": "정렬 + 양끝 좁히기 — 합 크면 hi↓, 작으면 lo↑",
-   "trap": "binary_search",
-   "also_ok": []
+   "text": "심사관마다 처리 시간이 다르다. n명이 모두 심사받는 최소 시간은?",
+   "answer": "binary_search",
+   "signals": "'시간 T에 다 처리되나?' 단조 판정 = 파라메트릭",
+   "trap": "heap",
+   "also_ok": [],
+   "source": {
+    "name": "프로그래머스 Kit — 입국심사 (Lv3)",
+    "url": "https://school.programmers.co.kr/learn/courses/30/lessons/43238"
+   }
   },
   {
    "id": "r044",
-   "text": "연속 부분합이 S 이상이 되는 가장 짧은 구간 길이는? (양수 배열)",
-   "answer": "two_pointer",
-   "signals": "양수라 창을 늘리면 합 증가(단조) = 슬라이딩 윈도우",
-   "trap": "dp",
-   "also_ok": []
+   "text": "지방 예산 요청에 상한을 정해, 총합이 한도 내에서 최대가 되는 상한액은?",
+   "answer": "binary_search",
+   "signals": "상한↔총합의 단조 관계 = 파라메트릭",
+   "trap": "greedy",
+   "also_ok": [],
+   "source": {
+    "name": "백준 2512 예산 (실버2, 재서술)",
+    "url": "https://www.acmicpc.net/problem/2512"
+   }
   },
   {
    "id": "r045",
-   "text": "특성값 배열에서 두 용액을 섞어 0에 가장 가까운 조합을 찾아라.",
+   "text": "회전 초밥 벨트에서 연속 k개 접시를 먹을 때 초밥 가짓수의 최댓값은? (+쿠폰 1종)",
    "answer": "two_pointer",
-   "signals": "정렬 후 양끝에서 절댓값 최소 추적",
-   "trap": "binary_search",
-   "also_ok": []
+   "signals": "고정 길이 창 이동 + 빈도 갱신 = 슬라이딩 윈도우",
+   "trap": "hash",
+   "also_ok": [
+    "hash"
+   ],
+   "source": {
+    "name": "백준 15961 회전 초밥 (골드4, 재서술)",
+    "url": "https://www.acmicpc.net/problem/15961"
+   }
   },
   {
    "id": "r046",
-   "text": "도로마다 통행 요금이 다르다. 집에서 회사까지 최소 요금 경로는?",
-   "answer": "dijkstra",
-   "signals": "간선 가중치가 다름 + 최단 = BFS 아니라 다익스트라",
-   "trap": "bfs",
-   "also_ok": []
+   "text": "양수 수열에서 부분합이 S 이상이 되는 가장 짧은 연속 구간의 길이는?",
+   "answer": "two_pointer",
+   "signals": "양수 = 창 늘리면 합 증가(단조) → 가변 창",
+   "trap": "dp",
+   "also_ok": [],
+   "source": {
+    "name": "백준 1806 부분합 (골드4)",
+    "url": "https://www.acmicpc.net/problem/1806"
+   }
   },
   {
    "id": "r047",
-   "text": "환승 시간이 노선마다 다른 지하철에서 최소 시간 경로를 구하라.",
-   "answer": "dijkstra",
-   "signals": "비용 상이 그래프 최단 — 힙으로 최소 비용 정점부터 확정",
-   "trap": "bfs",
-   "also_ok": []
+   "text": "산성·알칼리성 용액 배열에서 두 용액을 섞어 0에 가장 가까운 조합을 찾아라.",
+   "answer": "two_pointer",
+   "signals": "정렬 후 양끝 좁히기 — 절댓값 최소 추적",
+   "trap": "binary_search",
+   "also_ok": [],
+   "source": {
+    "name": "백준 2470 두 용액 (골드5)",
+    "url": "https://www.acmicpc.net/problem/2470"
+   }
   },
   {
    "id": "r048",
-   "text": "택배 창고에서 각 마을까지 배송 최소 비용을 전부 구하라. 도로 비용은 제각각.",
+   "text": "도로마다 이동 비용이 다른 도시에서, 출발점으로부터 모든 정점까지 최소 비용을 구하라.",
    "answer": "dijkstra",
-   "signals": "단일 출발 → 전체 최단 비용 = 다익스트라 기본형",
+   "signals": "간선 가중치 상이 + 최단 = BFS 아닌 다익스트라",
    "trap": "bfs",
-   "also_ok": []
+   "also_ok": [],
+   "source": {
+    "name": "백준 1753 최단경로 (골드4)",
+    "url": "https://www.acmicpc.net/problem/1753"
+   }
+  },
+  {
+   "id": "r049",
+   "text": "등산 코스에서 쉼터·정상까지 갈 때 '한 번에 걷는 최대 강도'를 최소화하는 코스를 찾아라.",
+   "answer": "dijkstra",
+   "signals": "경로의 max를 최소화(minimax) — 다익스트라 변형",
+   "trap": "bfs",
+   "also_ok": [],
+   "source": {
+    "name": "카카오 2022 여름인턴 4번 — 등산코스 정하기 (공식 해설)",
+    "url": "https://tech.kakao.com/posts/530"
+   }
+  },
+  {
+   "id": "r050",
+   "text": "모든 도시 쌍 사이의 최소 이동 비용 표를 만들어라 (도시 ≤ 100).",
+   "answer": "dijkstra",
+   "signals": "전 쌍 최단 + N 작음 = 플로이드-워셜 (다익스트라 계열)",
+   "trap": "bfs",
+   "also_ok": [],
+   "source": {
+    "name": "백준 11404 플로이드 (골드4, 재서술)",
+    "url": "https://www.acmicpc.net/problem/11404"
+   }
   }
- ],
- "_status": "PROVISIONAL — 2026-07-20. 문항 다수가 실제 기출(프로그래머스/백준)에서 파생됐으나 출처가 문항별로 검증·명시되지 않음. 리서치 완료 후 전 문항을 출처 URL에 앵커링해 재구축 예정 (James 지시: 추측 유형 금지, 기출·포탈·최신 트렌드 기반 필수)"
+ ]
 }
