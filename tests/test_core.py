@@ -233,3 +233,37 @@ async def test_dashboard_and_hint_flow(tmp_path, monkeypatch):
         assert screen.hint_level == 2
         await pilot.press("f1")
         assert screen.hint_level == 0 and "hidden" in panel.classes
+
+
+# ---------- career repo 싱크 ----------
+def test_sync_aggregate_and_export(tmp_path, monkeypatch):
+    """오늘 세션 집계 → career repo 파일 기록 (git 없는 경로·있는 경로)."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    conn = db.connect()
+    db.record_session(conn, "bfs-grid", "guided",
+                      {"wpm": 30, "accuracy": 96, "elapsed": 300, "errors": 2}, "큐")
+    db.record_session(conn, "topk-counter", "guided",
+                      {"wpm": 35, "accuracy": 98, "elapsed": 240, "errors": 1}, "힙")
+    agg = __import__("wf.sync", fromlist=["today_aggregate"]).today_aggregate(conn)
+    conn.close()
+    assert agg["sessions"] == 2
+    assert agg["total_minutes"] == 9.0
+    assert set(agg["katas"]) == {"bfs-grid", "topk-counter"}
+
+    from wf import sync
+    # git 없는 디렉토리 → 생략 (안전)
+    assert "career repo 없음" in sync.export_and_push(tmp_path / "not-a-repo")
+    # git repo → 파일 기록 + 커밋 (push는 리모트 없어 실패해도 조용)
+    import subprocess, json
+    repo = tmp_path / "repo"; repo.mkdir()
+    subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
+    msg = sync.export_and_push(repo)
+    export = repo / "data/warfront-daily.json"
+    assert export.exists()
+    data = json.loads(export.read_text())
+    from datetime import date
+    today = date.today().isoformat()
+    assert data[today]["sessions"] == 2
+    assert "push 실패" in msg or "동기화 완료" in msg  # 리모트 없음 → 전자

@@ -79,6 +79,17 @@ class ResultScreen(Screen):
             yield Static(menu, id="result-menu")
         yield Footer()
 
+    def on_mount(self) -> None:
+        # 일일 루틴 반영: career repo에 오늘 연습 요약 push (백그라운드, 실패 무시)
+        self.run_worker(self._sync_career, thread=True, exclusive=True)
+
+    def _sync_career(self) -> None:
+        from wf import sync
+        msg = sync.export_and_push()
+        if msg.startswith("동기화 완료"):
+            self.app.call_from_thread(
+                self.notify, f"📊 일일 루틴 반영 — {msg}", timeout=4)
+
     def action_home(self) -> None:
         from wf.screens.home import HomeScreen
         self.app.switch_screen(HomeScreen())
