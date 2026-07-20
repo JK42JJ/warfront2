@@ -12,14 +12,17 @@ class WarfrontApp(App):
     CSS = """
     Screen { align: center middle; }
 
-    /* ---- 홈 ---- */
-    #home { align: center middle; width: 100%; height: 100%; }
-    #banner { width: auto; color: $accent; text-style: bold; margin: 1 0; content-align: center middle; width: 100%; }
-    #tagline { text-align: center; color: $text-muted; margin-bottom: 2; width: 100%; }
-    #streak-digits { color: $warning; }
-    #streak-label { text-align: center; width: 100%; margin-top: 1; }
-    #menu { text-align: center; width: 100%; margin-top: 2; color: $text; }
-    #spacer { height: 1; }
+    /* ---- 대시보드(홈) ---- */
+    #dash { padding: 1 3; height: auto; width: 100%; }
+    #dash-head { height: auto; margin-bottom: 1; }
+    #dash-top { height: auto; align-horizontal: center; margin-bottom: 1; }
+    .dash-metric { width: auto; height: auto; margin: 0 4; }
+    .dash-metric Digits { width: auto; color: $warning; }
+    .dash-metric .stat-label { width: 100%; height: 1; text-align: center;
+                               color: $text-muted; margin-top: 1; }
+    #kata-table { height: auto; max-height: 20; margin-bottom: 1; }
+    #dash-help { height: auto; color: $text-muted; text-align: center; width: 100%; }
+    #hint-panel { height: auto; border: tall $success; padding: 1 2; margin-top: 1; }
 
     /* ---- 카타 ----
        주의: Vertical/Horizontal 기본 height는 1fr(화면 채움) — auto로 강제하지

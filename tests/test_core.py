@@ -165,3 +165,71 @@ async def test_layout_widgets_visible_in_viewport(tmp_path, monkeypatch):
             r = w.region
             assert r.height > 0, f"{w.id or w.classes} 높이 0 (숨겨짐)"
             assert r.y + r.height <= H, f"{w.id or w.classes} 화면 밖 (y={r.y}, h={r.height})"
+
+
+# ---------- 4단계 진행·빈칸 모드 ----------
+def test_active_ranges_auto_skip():
+    """빈칸 모드: 비활성(주어진) 구간은 타이핑 없이 자동 통과."""
+    s = TypingSession(target="abcdef", active_ranges=[(2, 4)])
+    assert s.pos == 2                    # 시작 즉시 활성 구간으로
+    assert s.feed("c") == "ok"
+    assert s.feed("d") == "done"         # 활성 구간 끝나면 나머지 자동 통과=완료
+    assert s.keystrokes == 2
+
+
+def test_kata_progress_stage_unlock(tmp_path):
+    """보고(95%+) 통과해야 빈칸 해금, 그 다음 재현·구현."""
+    conn = db.connect(tmp_path / "p.db")
+    p = db.kata_progress(conn, "bfs-grid")
+    assert p["next_mode"] == "guided"    # 아무것도 안 함 → 보고부터
+    db.record_session(conn, "bfs-grid", "guided",
+                      {"wpm": 30, "accuracy": 96.0, "elapsed": 60, "errors": 2}, "큐")
+    assert db.kata_progress(conn, "bfs-grid")["next_mode"] == "cloze"
+    db.record_session(conn, "bfs-grid", "cloze",
+                      {"wpm": 28, "accuracy": 90.0, "elapsed": 50, "errors": 5}, "큐")
+    # 빈칸 정확도 95% 미달 → 재현 해금 안 됨
+    assert db.kata_progress(conn, "bfs-grid")["next_mode"] == "cloze"
+    db.record_session(conn, "bfs-grid", "cloze",
+                      {"wpm": 30, "accuracy": 97.0, "elapsed": 45, "errors": 1}, "큐")
+    assert db.kata_progress(conn, "bfs-grid")["next_mode"] == "recall"
+    conn.close()
+
+
+def test_subgoal_char_range():
+    from wf.content.loader import get_kata
+    k = get_kata("bfs-grid")
+    lo, hi = k.subgoal_char_range(0)
+    block = k.code[lo:hi]
+    assert "deque" in block and "seen = {start}" in block   # ① 준비 블록
+    lo, hi = k.subgoal_char_range(3)
+    assert "return -1" in k.code[lo:hi]                     # ④ 실패 블록
+
+
+@pytest.mark.asyncio
+async def test_dashboard_and_hint_flow(tmp_path, monkeypatch):
+    """대시보드 → 카타 선택 → THINK → 힌트 h 2단계 토글."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.kata import KataScreen
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        # 대시보드: 카타 테이블 존재 + 일차 표시
+        assert app.screen.query_one("#kata-table") is not None
+        assert app.screen.query_one("#day-digits") is not None
+        await pilot.press("enter")           # 첫 행 선택 → 카타
+        await pilot.pause()
+        screen = app.screen
+        assert isinstance(screen, KataScreen)
+        for ch in "큐로 층별 확장":
+            await pilot.press(ch if ch != " " else "space")
+        await pilot.press("enter")
+        await pilot.pause()
+        assert screen.phase == "type"
+        # 힌트 토글: 0→1(서브골)→2(라인)→0 (F1 — 타이핑 글자와 충돌 없는 키)
+        await pilot.press("f1")
+        panel = screen.query_one("#hint-panel")
+        assert "hidden" not in panel.classes and screen.hint_level == 1
+        await pilot.press("f1")
+        assert screen.hint_level == 2
+        await pilot.press("f1")
+        assert screen.hint_level == 0 and "hidden" in panel.classes

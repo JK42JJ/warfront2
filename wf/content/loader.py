@@ -17,7 +17,19 @@ class Kata:
     think_prompt: str
     think_model: str
     code: str
+    desc: str = ""
+    expected_complexity: str = ""
+    subgoals: list[dict] = field(default_factory=list)
+    line_notes: dict = field(default_factory=dict)
     resources: list[dict] = field(default_factory=list)
+
+    def subgoal_char_range(self, idx: int) -> tuple[int, int]:
+        """서브골 idx의 (시작, 끝+1) 문자 오프셋 — cloze 활성 구간 계산용."""
+        lines = self.code.split("\n")
+        lo, hi = self.subgoals[idx]["lines"]
+        start = sum(len(l) + 1 for l in lines[:lo])
+        end = sum(len(l) + 1 for l in lines[:hi + 1])
+        return start, min(end, len(self.code))
 
 
 def load_katas() -> list[Kata]:

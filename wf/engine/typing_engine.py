@@ -18,12 +18,26 @@ from dataclasses import dataclass, field
 @dataclass
 class TypingSession:
     target: str
+    active_ranges: list[tuple[int, int]] | None = None  # None=전체 타이핑, 지정 시 구간 밖 자동 통과(빈칸 모드)
     pos: int = 0
     errors: int = 0
     keystrokes: int = 0
     started_at: float | None = None
     finished_at: float | None = None
     error_positions: set[int] = field(default_factory=set)
+
+    def __post_init__(self) -> None:
+        self._auto_advance()  # 시작 지점이 비활성 구간이면 활성 구간까지 자동 이동
+
+    def is_active(self, i: int) -> bool:
+        if self.active_ranges is None:
+            return True
+        return any(lo <= i < hi for lo, hi in self.active_ranges)
+
+    def _auto_advance(self) -> None:
+        """비활성 구간(주어진 코드)은 타이핑 없이 통과."""
+        while self.pos < len(self.target) and not self.is_active(self.pos):
+            self.pos += 1
 
     # ---- 상태 조회 ----
     @property
@@ -64,6 +78,7 @@ class TypingSession:
         if char == expected or (expected == "\n" and char in ("\n", "\r")):
             self.pos += 1
             self._skip_indent_after_newline(expected)
+            self._auto_advance()
             if self.done:
                 self.finished_at = time.monotonic()
                 return "done"

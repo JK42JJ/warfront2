@@ -3,12 +3,71 @@
   "type": "bfs",
   "title": "BFS — 격자 최단거리",
   "belt": "탐색",
+  "desc": "격자에서 시작→목표 최단거리. 코테 최빈출 유형(삼성 단골).",
+  "expected_complexity": "O(N·M)",
   "think_prompt": "BFS가 '최단거리'를 보장하는 이유는? 핵심 자료구조는? (한 줄로 선언 후 Enter — 또는 ✏️ 연필로 격자에 파도가 퍼지는 그림을 먼저 그려보세요)",
   "think_model": "큐(FIFO). 같은 거리의 층을 전부 소진한 뒤 다음 층으로 가므로, 목표에 처음 닿는 순간이 곧 최단거리다.",
   "code": "from collections import deque\n\ndef bfs(grid, start, goal):\n    n, m = len(grid), len(grid[0])\n    q = deque([(start, 0)])\n    seen = {start}\n    while q:\n        (r, c), d = q.popleft()\n        if (r, c) == goal:\n            return d\n        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < n and 0 <= nc < m:\n                if grid[nr][nc] == 0 and (nr, nc) not in seen:\n                    seen.add((nr, nc))\n                    q.append(((nr, nc), d + 1))\n    return -1\n",
+  "subgoals": [
+    {
+      "label": "① 준비: 큐에 (시작점, 거리0) 넣고 방문 표시",
+      "lines": [
+        0,
+        5
+      ]
+    },
+    {
+      "label": "② 꺼내기: 큐 앞에서 하나 꺼내 목표면 거리 반환",
+      "lines": [
+        6,
+        9
+      ]
+    },
+    {
+      "label": "③ 확장: 상하좌우 이웃 중 (범위 안·벽 아님·미방문)만 방문 표시 후 큐에 +1 거리로",
+      "lines": [
+        10,
+        15
+      ]
+    },
+    {
+      "label": "④ 실패: 큐가 비면 도달 불가 = -1",
+      "lines": [
+        16,
+        16
+      ]
+    }
+  ],
+  "line_notes": {
+    "0": "deque — 양끝 O(1) 큐. BFS의 심장",
+    "3": "격자 크기: n=행, m=열",
+    "4": "큐 원소는 (좌표, 거리) 튜플 — 시작 거리는 0",
+    "5": "seen 집합 — 재방문 차단(무한루프 방지). '큐에 넣을 때' 표시가 핵심",
+    "7": "popleft = FIFO — 가장 오래된(가까운 층) 것부터",
+    "8": "목표 도달 즉시 반환 — BFS라 이게 최단",
+    "10": "방향 벡터 4개 — 상하좌우를 튜플로 순회",
+    "12": "경계 검사 — 격자 밖 인덱스 방지 (0 <= x < n 패턴)",
+    "13": "벽(1) 아님 + 미방문일 때만",
+    "14": "★큐에 넣기 전에 seen 추가 — 꺼낼 때 추가하면 중복 삽입 폭발",
+    "15": "이웃은 현재 거리 +1",
+    "17": "큐 소진 = 모든 도달 가능 칸 탐색 완료, 목표 못 만남"
+  },
   "resources": [
-    {"name": "백준 2178 미로 탐색 (실버1)", "url": "https://www.acmicpc.net/problem/2178"},
-    {"name": "백준 1926 그림 (실버1)", "url": "https://www.acmicpc.net/problem/1926"},
-    {"name": "HackerRank — BFS: Shortest Reach", "url": "https://www.hackerrank.com/challenges/bfsshortreach/problem"}
+    {
+      "name": "백준 2178 미로 탐색 (실버1)",
+      "url": "https://www.acmicpc.net/problem/2178"
+    },
+    {
+      "name": "HackerRank — BFS: Shortest Reach",
+      "url": "https://www.hackerrank.com/challenges/bfsshortreach/problem"
+    },
+    {
+      "name": "HackerRank — Connected Cells in a Grid",
+      "url": "https://www.hackerrank.com/challenges/connected-cell-in-a-grid/problem"
+    },
+    {
+      "name": "백준 1926 그림 (실버1)",
+      "url": "https://www.acmicpc.net/problem/1926"
+    }
   ]
 }

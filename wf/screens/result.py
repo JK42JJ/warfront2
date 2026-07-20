@@ -71,8 +71,11 @@ class ResultScreen(Screen):
             yield Static(res, id="resources")
 
             menu = Text()
-            menu.append(f"🔥 연속 {self.streak}일   ", style="bold")
-            menu.append("⏎ 홈    r 다시", style="dim")
+            menu.append(f"🔥 연속 {self.streak}일", style="bold")
+            hints = self.summary.get("hints_used", 0)
+            if hints:
+                menu.append(f"   💡 힌트 {hints}회", style="yellow")
+            menu.append("   ⏎ 홈(대시보드 반영)    r 다시", style="dim")
             yield Static(menu, id="result-menu")
         yield Footer()
 

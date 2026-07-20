@@ -3,12 +3,49 @@
   "type": "hash",
   "title": "해시 — 빈도 집계 Top-K",
   "belt": "해시",
+  "desc": "빈도 상위 K개 추출. 카카오 1~2번 단골(문자열+해시).",
+  "expected_complexity": "O(N log K)",
   "think_prompt": "빈도 상위 K개를 뽑을 때 전체 정렬 대신 무엇을 쓰면 O(n log k)가 되나? 동률 처리(tie-break)는? (한 줄 선언 후 Enter)",
   "think_model": "Counter로 O(n) 집계 후 heapq.nsmallest(k, key=(-빈도, 이름)) — 힙 크기를 k로 유지해 O(n log k). 동률은 key 튜플 2번째 요소(사전순)로.",
   "code": "from collections import Counter\nimport heapq\n\ndef top_k(words, k):\n    c = Counter(words)\n    return heapq.nsmallest(k, c.items(), key=lambda x: (-x[1], x[0]))\n",
+  "subgoals": [
+    {
+      "label": "① 집계: Counter로 단어→빈도 해시 O(N)",
+      "lines": [
+        0,
+        4
+      ]
+    },
+    {
+      "label": "② 선별: 힙으로 상위 K만 O(N log K) — 동률은 key 튜플로",
+      "lines": [
+        5,
+        5
+      ]
+    }
+  ],
+  "line_notes": {
+    "0": "Counter — dict 서브클래스, 등장 횟수 자동 집계",
+    "1": "heapq — 최소힙. nsmallest/nlargest가 Top-K 도구",
+    "4": "한 줄로 전체 빈도표 완성 — O(N)",
+    "5": "key=(-빈도, 이름): 빈도 내림차순 + 동률 사전순을 한 번에. nsmallest인 이유 = 부호 뒤집기와 tie-break 방향을 맞추기 위함"
+  },
   "resources": [
-    {"name": "백준 1927 최소 힙 (실버2)", "url": "https://www.acmicpc.net/problem/1927"},
-    {"name": "백준 20291 파일 정리 (실버3)", "url": "https://www.acmicpc.net/problem/20291"},
-    {"name": "HackerRank — Word Order (dict 빈도)", "url": "https://www.hackerrank.com/challenges/word-order/problem"}
+    {
+      "name": "HackerRank — Word Order (dict 빈도)",
+      "url": "https://www.hackerrank.com/challenges/word-order/problem"
+    },
+    {
+      "name": "HackerRank — QHEAP1 (힙 기초)",
+      "url": "https://www.hackerrank.com/challenges/qheap1/problem"
+    },
+    {
+      "name": "백준 1927 최소 힙 (실버2)",
+      "url": "https://www.acmicpc.net/problem/1927"
+    },
+    {
+      "name": "백준 20291 파일 정리 (실버3)",
+      "url": "https://www.acmicpc.net/problem/20291"
+    }
   ]
 }

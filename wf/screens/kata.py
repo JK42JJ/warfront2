@@ -1,7 +1,12 @@
-"""카타 화면 — THINK 게이트(생각 먼저) → 타이핑(따라치기).
+"""카타 화면 — THINK 게이트(생각 먼저) → 타이핑 (보고/빈칸/재현 모드).
 
 Think-First: 접근을 한 줄로 선언해야 코드 타이핑이 열린다.
 타건감: 키 입력마다 글자 단위 즉시 색 판정 + WPM/정확도 실시간 대형 표시.
+모드(faded worked examples — 리서치 근거):
+  guided 보고 따라치기 — 전체 코드 보임
+  cloze  빈칸 채우기   — 서브골 한 블록만 가림(세션마다 로테이션), 나머지는 주어짐
+  recall 안 보고 재현  — 전체 가림(줄 구조만 보임)
+힌트(F1 키, 2단계): 1=서브골 블록 라벨(전이 효과 실증) → 2=+현재 줄 자연어 설명(최후 수단)
 """
 from __future__ import annotations
 
@@ -14,44 +19,64 @@ from textual.widgets import Digits, Footer, Input, Static
 
 from wf.content.loader import Kata
 from wf.engine.typing_engine import TypingSession
+from wf.store import db
 
 # 글자 상태 색 (타건감의 시각 언어)
 C_DONE = "bold white"
 C_ERROR_MARK = "bold red"
 C_CURSOR = "black on yellow"
 C_PENDING = "grey42"
+C_GIVEN = "grey58"        # 빈칸 모드에서 '주어진' 코드
+MASK = "·"                 # 가려진 글자
 
 
 class KataScreen(Screen):
-    BINDINGS = [("escape", "back", "홈으로")]
+    BINDINGS = [
+        ("escape", "back", "홈으로"),
+        ("f1", "hint", "힌트(단계)"),
+    ]
 
     def __init__(self, kata: Kata, mode: str = "guided") -> None:
         super().__init__()
         self.kata = kata
         self.mode = mode
-        self.session = TypingSession(target=kata.code)
+        self.hint_level = 0
+        self.hints_used = 0
+        active = self._active_ranges()
+        self.session = TypingSession(target=kata.code, active_ranges=active)
         self.phase = "think"  # think → type
         self.think_answer = ""
 
+    def _active_ranges(self) -> list[tuple[int, int]] | None:
+        """모드별 타이핑 대상 구간. guided/recall=전체, cloze=서브골 1블록(로테이션)."""
+        if self.mode != "cloze" or not self.kata.subgoals:
+            return None
+        conn = db.connect()
+        done = db.kata_progress(conn, self.kata.id)["counts"]["cloze"]
+        conn.close()
+        idx = done % len(self.kata.subgoals)
+        self.cloze_idx = idx
+        return [self.kata.subgoal_char_range(idx)]
+
     # ---------- 레이아웃 ----------
     def compose(self) -> ComposeResult:
-        # 콘텐츠 유래 문자열은 마크업 보간 금지 — Text로 구성 (MarkupError 재발 방지)
-        from rich.text import Text
         title = Text()
         title.append(self.kata.title, style="bold")
-        title.append(f"  ·  {self.kata.belt} 벨트  ·  {self.mode}")
+        mode_ko = {"guided": "보고 따라치기", "cloze": "빈칸 채우기", "recall": "안 보고 재현"}
+        title.append(f"  ·  {self.kata.belt} 벨트  ·  {mode_ko.get(self.mode, self.mode)}")
+        if self.kata.expected_complexity:
+            title.append(f"  ·  기대 복잡도 {self.kata.expected_complexity}", style="cyan")
         prompt = Text()
         prompt.append("🧠 THINK — ", style="bold yellow")
         prompt.append(self.kata.think_prompt)
         with Vertical(id="kata"):
             yield Static(title, id="kata-title")
-            # THINK 게이트
             with Vertical(id="think-box"):
                 yield Static(prompt, id="think-prompt")
                 yield Input(placeholder="내 접근을 한 줄로 선언하고 Enter (연필로 그렸다면 요점만)", id="think-input")
-            # 타이핑 영역 (THINK 통과 후 표시)
             with Vertical(id="type-box", classes="hidden"):
                 yield Static(id="code-display")
+                yield Static(id="hint-panel", classes="hidden")
                 with Horizontal(id="stats"):
                     yield Digits("0", id="wpm-digits")
                     yield Static("타속 WPM", classes="stat-label")
@@ -78,6 +103,37 @@ class KataScreen(Screen):
         self.set_interval(0.5, self._refresh_stats)
         self.set_focus(None)  # 키 이벤트를 화면이 직접 받는다
 
+    # ---------- 힌트 (F1 — 2단계) ----------
+    def action_hint(self) -> None:
+        if self.phase != "type":
+            return
+        self.hint_level = (self.hint_level + 1) % 3
+        if self.hint_level > 0:
+            self.hints_used += 1
+        panel = self.query_one("#hint-panel", Static)
+        if self.hint_level == 0:
+            panel.add_class("hidden")
+            return
+        panel.remove_class("hidden")
+        text = Text()
+        if self.hint_level >= 1:
+            text.append("💡 서브골 (구조 힌트)\n", style="bold yellow")
+            for i, sg in enumerate(self.kata.subgoals):
+                cur = self._current_line()
+                lo, hi = sg["lines"]
+                marker = "▶ " if lo <= cur <= hi else "  "
+                style = "bold" if lo <= cur <= hi else "dim"
+                text.append(f"{marker}{sg['label']}\n", style=style)
+        if self.hint_level == 2:
+            cur = self._current_line()
+            note = self.kata.line_notes.get(str(cur))
+            text.append("\n📝 현재 줄: ", style="bold cyan")
+            text.append(note if note else "(이 줄 설명 없음)")
+        panel.update(text)
+
+    def _current_line(self) -> int:
+        return self.kata.code[: self.session.pos].count("\n")
+
     # ---------- 타이핑 ----------
     def on_key(self, event: events.Key) -> None:
         if self.phase != "type":
@@ -91,20 +147,38 @@ class KataScreen(Screen):
             return
         event.stop()
         self._render_code()
+        if self.hint_level == 2:
+            self.action_hint_refresh()
         if result == "done":
             self._finish()
+
+    def action_hint_refresh(self) -> None:
+        """레벨2 힌트는 커서 줄 이동 시 갱신."""
+        level = self.hint_level
+        self.hint_level = level - 1  # action_hint가 +1 하므로 보정
+        self.hints_used -= 1         # 갱신은 사용 횟수에 안 셈
+        self.action_hint()
 
     def _render_code(self) -> None:
         s = self.session
         text = Text()
         for i, ch in enumerate(self.kata.code):
-            visible = "⏎\n" if ch == "\n" else ch
-            if i < s.pos:
-                style = C_ERROR_MARK if i in s.error_positions else C_DONE
+            newline = ch == "\n"
+            typed = i < s.pos
+            active = s.is_active(i)
+            if typed:
+                visible = "⏎\n" if newline else ch
+                style = C_ERROR_MARK if i in s.error_positions else (C_DONE if active else C_GIVEN)
             elif i == s.pos:
+                visible = "⏎\n" if newline else (ch if self.mode == "guided" else MASK)
                 style = C_CURSOR
             else:
-                style = C_PENDING
+                if self.mode == "guided" or not active:
+                    visible = "⏎\n" if newline else ch
+                    style = C_PENDING if active else C_GIVEN
+                else:  # cloze 활성 블록·recall 전체: 가림 (줄 구조만 노출)
+                    visible = "\n" if newline else MASK
+                    style = C_PENDING
             text.append(visible, style=style)
         self.query_one("#code-display", Static).update(text)
 
@@ -116,6 +190,7 @@ class KataScreen(Screen):
     def _finish(self) -> None:
         from wf.screens.result import ResultScreen
         summary = self.session.summary()
+        summary["hints_used"] = self.hints_used
         self.app.switch_screen(
             ResultScreen(self.kata, self.mode, summary, self.think_answer)
         )

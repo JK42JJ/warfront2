@@ -23,7 +23,47 @@ CREATE TABLE IF NOT EXISTS bests (
     wpm REAL, accuracy REAL,
     PRIMARY KEY (kata_id, mode)
 );
+CREATE TABLE IF NOT EXISTS meta (
+    key TEXT PRIMARY KEY, value TEXT
+);
 """
+
+MODES = ("guided", "cloze", "recall", "solve")  # 보고 → 빈칸 → 재현 → 구현
+UNLOCK_ACCURACY = 95.0  # 다음 단계 해금 정확도
+
+
+def course_day(conn: sqlite3.Connection) -> int:
+    """50일 과정 일차 — 최초 실행일을 시작일로 기록."""
+    row = conn.execute("SELECT value FROM meta WHERE key='start_date'").fetchone()
+    if row is None:
+        start = date.today()
+        conn.execute("INSERT INTO meta (key, value) VALUES ('start_date', ?)",
+                     (start.isoformat(),))
+        conn.commit()
+    else:
+        start = date.fromisoformat(row[0])
+    return (date.today() - start).days + 1
+
+
+def kata_progress(conn: sqlite3.Connection, kata_id: str) -> dict:
+    """카타별 모드 수행 횟수·최고 정확도·다음 단계."""
+    counts = {m: 0 for m in MODES}
+    best_acc = {m: 0.0 for m in MODES}
+    for mode, cnt, acc in conn.execute(
+        "SELECT mode, COUNT(*), MAX(accuracy) FROM sessions WHERE kata_id=? GROUP BY mode",
+        (kata_id,),
+    ):
+        if mode in counts:
+            counts[mode] = cnt
+            best_acc[mode] = acc or 0.0
+    # 다음 단계: 이전 단계를 해금 정확도로 통과했을 때만 전진
+    next_mode = MODES[0]
+    for i, m in enumerate(MODES[:-1]):
+        if counts[m] > 0 and best_acc[m] >= UNLOCK_ACCURACY:
+            next_mode = MODES[i + 1]
+        else:
+            break
+    return {"counts": counts, "best_acc": best_acc, "next_mode": next_mode}
 
 
 def connect(db_path: Path | None = None) -> sqlite3.Connection:
