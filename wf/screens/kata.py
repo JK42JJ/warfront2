@@ -35,11 +35,19 @@ class KataScreen(Screen):
 
     # ---------- 레이아웃 ----------
     def compose(self) -> ComposeResult:
+        # 콘텐츠 유래 문자열은 마크업 보간 금지 — Text로 구성 (MarkupError 재발 방지)
+        from rich.text import Text
+        title = Text()
+        title.append(self.kata.title, style="bold")
+        title.append(f"  ·  {self.kata.belt} 벨트  ·  {self.mode}")
+        prompt = Text()
+        prompt.append("🧠 THINK — ", style="bold yellow")
+        prompt.append(self.kata.think_prompt)
         with Vertical(id="kata"):
-            yield Static(f"[b]{self.kata.title}[/b]  ·  {self.kata.belt} 벨트  ·  {self.mode}", id="kata-title")
+            yield Static(title, id="kata-title")
             # THINK 게이트
             with Vertical(id="think-box"):
-                yield Static(f"🧠 [b]THINK[/b] — {self.kata.think_prompt}", id="think-prompt")
+                yield Static(prompt, id="think-prompt")
                 yield Input(placeholder="내 접근을 한 줄로 선언하고 Enter (연필로 그렸다면 요점만)", id="think-input")
             # 타이핑 영역 (THINK 통과 후 표시)
             with Vertical(id="type-box", classes="hidden"):

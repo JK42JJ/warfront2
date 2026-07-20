@@ -91,3 +91,38 @@ async def test_app_smoke(tmp_path, monkeypatch):
         await pilot.press("enter")
         await pilot.pause()
         assert app.screen.phase == "type"
+
+
+@pytest.mark.asyncio
+async def test_result_screen_renders_with_urls(tmp_path, monkeypatch):
+    """회귀: 타이핑 완주 → Result 화면 (URL 포함 콘텐츠) 렌더가 죽지 않아야.
+
+    2026-07-20 실사용 크래시: [link=https://...] 마크업 보간 → MarkupError.
+    Result 화면까지 실제 도달시켜 렌더를 검증한다.
+    """
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.kata import KataScreen
+    from wf.screens.result import ResultScreen
+
+    app = WarfrontApp()
+    async with app.run_test(size=(120, 50)) as pilot:
+        await pilot.press("enter")            # 홈 → 카타
+        await pilot.pause()
+        screen = app.screen
+        assert isinstance(screen, KataScreen)
+        # THINK 통과
+        for ch in "큐로 층별 확장":
+            await pilot.press(ch if ch != " " else "space")
+        await pilot.press("enter")
+        await pilot.pause()
+        # 타이핑을 엔진에 직접 완주시킨 뒤 마지막 키만 실제 입력 → _finish 경로 실행
+        target = screen.session.target
+        for c in target[:-1]:
+            screen.session.feed(c)
+        last = target[-1]
+        await pilot.press("enter" if last == "\n" else last)
+        await pilot.pause()
+        # Result 화면이 크래시 없이 마운트·렌더됐는가 (URL 포함 resources 위젯 존재)
+        assert isinstance(app.screen, ResultScreen)
+        assert app.screen.query_one("#resources") is not None

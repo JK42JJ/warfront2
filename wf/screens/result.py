@@ -1,6 +1,12 @@
-"""결과 — 즉시 요약(대형 숫자) + 설계 선언 vs 모범 접근 비교 + 개인최고."""
+"""결과 — 즉시 요약(대형 숫자) + 설계 선언 vs 모범 접근 비교 + 개인최고.
+
+주의: 콘텐츠 유래 문자열(제목·URL·사용자 입력)은 마크업 보간 금지 —
+Rich Text 객체로 구성한다. (2026-07-20 MarkupError 크래시: [link=URL]에
+'https://'가 들어가 파서가 죽음 — 회귀 테스트로 고정)
+"""
 from __future__ import annotations
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
@@ -30,8 +36,12 @@ class ResultScreen(Screen):
     def compose(self) -> ComposeResult:
         s = self.summary
         with Vertical(id="result"):
-            title = "🏆 개인최고 갱신!" if self.best["new_best"] else "세션 완료"
-            yield Static(f"[b]{title}[/b] — {self.kata.title}", id="result-title")
+            title = Text()
+            title.append("🏆 개인최고 갱신!  " if self.best["new_best"] else "세션 완료  ",
+                         style="bold green")
+            title.append(self.kata.title, style="bold")
+            yield Static(title, id="result-title")
+
             with Horizontal(id="result-stats"):
                 with Vertical(classes="stat-block"):
                     yield Digits(str(int(s["wpm"])), classes="big-stat")
@@ -42,17 +52,28 @@ class ResultScreen(Screen):
                 with Vertical(classes="stat-block"):
                     yield Digits(str(int(s["elapsed"])), classes="big-stat")
                     yield Static("초", classes="stat-label")
-            # Think-First 피드백: 내 선언 vs 모범 접근
-            yield Static(
-                f"🧠 [b]내 설계 선언[/b]: {self.think_answer}\n"
-                f"📗 [b]모범 접근[/b]: {self.kata.think_model}",
-                id="think-compare",
-            )
-            # 보조학습 링크 (백준·HackerRank)
-            links = "\n".join(f"  · {r['name']} — [link={r['url']}]{r['url']}[/link]"
-                              for r in self.kata.resources)
-            yield Static(f"📚 [b]실전 링크[/b] (직접 제출):\n{links}", id="resources")
-            yield Static(f"🔥 연속 {self.streak}일 · [b]⏎[/b] 홈  [b]r[/b] 다시", id="result-menu")
+
+            # Think-First 피드백: 내 선언 vs 모범 접근 (Text로 안전 구성)
+            compare = Text()
+            compare.append("🧠 내 설계 선언: ", style="bold yellow")
+            compare.append(self.think_answer)
+            compare.append("\n📗 모범 접근: ", style="bold green")
+            compare.append(self.kata.think_model)
+            yield Static(compare, id="think-compare")
+
+            # 보조학습 링크 (백준·HackerRank) — URL은 평문(터미널이 자동 링크화)
+            res = Text()
+            res.append("📚 실전 링크 (직접 제출):\n", style="bold")
+            for r in self.kata.resources:
+                res.append(f"  · {r['name']} — ")
+                res.append(r["url"], style="underline cyan")
+                res.append("\n")
+            yield Static(res, id="resources")
+
+            menu = Text()
+            menu.append(f"🔥 연속 {self.streak}일   ", style="bold")
+            menu.append("⏎ 홈    r 다시", style="dim")
+            yield Static(menu, id="result-menu")
         yield Footer()
 
     def action_home(self) -> None:
