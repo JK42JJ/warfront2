@@ -151,3 +151,9 @@ wf setup https://github.com/<계정>/my-records.git
 SW역량테스트 공식 기출, HackerRank Interview Preparation Kit 기반입니다.
 문항별 출처는 [docs/SOURCES.md](docs/SOURCES.md)에,
 설계 배경은 [docs/DESIGN.md](docs/DESIGN.md)에 있습니다.
+
+## 기여
+
+문제 추가가 가장 필요한 기여입니다 — 실전에서 본 유형이면 더 좋습니다.
+방법은 [CONTRIBUTING.md](CONTRIBUTING.md)에. AI 에이전트로 작업한다면
+저장소를 열고 "문제 추가해줘"라고 하면 형식과 검증이 자동 적용됩니다.
