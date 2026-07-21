@@ -10,8 +10,7 @@ class WarfrontApp(App):
     TITLE = "WARFRONT 2"
 
     CSS = """
-    Screen { align: center middle; }
-    HomeScreen { align: center top; }   /* 매일 보는 화면 — 위 정렬로 여백 산만함 제거 */
+    Screen { align: center top; }   /* 전 화면 상단 정렬 — 화면 간 시작 높이 통일 (2026-07-21 James) */
     #course-progress { height: auto; margin-bottom: 1; }
 
     /* ---- 대시보드(홈): 좌 작업(테이블) / 우 관측(캐릭터·진행) 콕핏 ---- */
