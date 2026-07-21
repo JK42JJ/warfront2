@@ -64,7 +64,14 @@ class SolveScreen(Screen):
         prompt.append("🧠 THINK — ", style="bold yellow")
         prompt.append(self.kata.think_prompt)
         desc = Text()
-        desc.append("기능이 맞으면 pass — 변수명·구현 방식 자유. Ctrl+R 채점", style="dim")
+        # 모드 오인 방지(2026-07-21 실사용): 재현·구현이 같은 백지 화면이라 모드 칩을 크게 박는다
+        if self.mode == "recall":
+            desc.append(" 재현 모드 ", style="bold black on orange1")
+            desc.append("  방금 익힌 패턴을 기억만으로 다시 쓴다 — 통과해야 '구현' 해금", style="orange1")
+        else:
+            desc.append(" 구현 모드 ", style="bold black on green")
+            desc.append("  스스로 설계해서 푼다 — 마지막 단계", style="green")
+        desc.append("   (기능이 맞으면 pass · Ctrl+R 채점)", style="dim")
         stmt = Static(statement_text(self.kata), id="stmt-panel")
         stmt.border_title = "문제" if self.kata.statement_lang != "en" else "Problem"
         with Vertical(id="solve"):
