@@ -121,11 +121,11 @@ class HomeScreen(Screen):
         for i, m in enumerate(MODES_ORDER):
             cnt = p["counts"][m]
             if (i < ni) or (m == "solve" and solved):
-                t.append(f"▰{STAGE_KO[i]}", style="bold green")
+                t.append(f"▰ {STAGE_KO[i]}", style="bold green")
             elif i == ni and not solved:
-                t.append(f"▶{STAGE_KO[i]}", style="bold yellow")
+                t.append(f"▶ {STAGE_KO[i]}", style="bold yellow")
             else:
-                t.append(f"▱{STAGE_KO[i]}", style="grey50")
+                t.append(f"▱ {STAGE_KO[i]}", style="grey50")
             t.append(f"{cnt if cnt else '·'}", style="dim")
             t.append("  ")
         return t
