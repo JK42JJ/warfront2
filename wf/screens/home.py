@@ -238,10 +238,17 @@ class HomeScreen(Screen):
         self.query_one("#char-label", Static).update(label)
 
     def _open(self, kata_id: str, mode: str) -> None:
-        from wf.content.loader import get_kata
+        from wf.content.loader import get_kata, variant_for
         kata = get_kata(kata_id)
         if mode in ("recall", "solve"):     # 백지 구현 — 기능 동등 판정
             from wf.screens.solve import SolveScreen
+            if mode == "solve":
+                variant = variant_for(kata)
+                if variant is not None:     # 구현 = 같은 유형의 변형 문제 (낯선 표면)
+                    self.app.push_screen(SolveScreen(variant, "solve",
+                                                     record_as=kata.id,
+                                                     origin_title=kata.title))
+                    return
             self.app.push_screen(SolveScreen(kata, mode))
         else:                                # 타이핑 카타 — 보고/빈칸
             from wf.screens.kata import KataScreen

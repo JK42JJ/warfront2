@@ -701,3 +701,12 @@ async def test_character_evolution_once(tmp_path, monkeypatch):
         conn = db.connect()
         assert db.get_meta(conn, "char_stage_seen") == "1"  # 재진입 시 중복 축하 없음
         conn.close()
+
+
+def test_variant_for_and_solve_policy():
+    """구현 단계 정책(2026-07-21): 변형 있는 유형은 변형 문제로, 없는 유형은 재현=구현 통합."""
+    from wf.content.loader import get_kata, variant_for
+    v = variant_for(get_kata("bfs-grid"))
+    assert v is not None and v.type == "bfs" and v.id.startswith("v-")
+    assert variant_for(get_kata("py-parse")) is None      # basics — 변형 없음
+    assert variant_for(get_kata("dijkstra")) is None      # 변형 미제작 유형

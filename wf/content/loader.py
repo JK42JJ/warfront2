@@ -72,3 +72,13 @@ def get_any(item_id: str) -> Kata:
         if k.id == item_id:
             return k
     raise KeyError(item_id)
+
+
+def variant_for(kata: "Kata") -> "Kata | None":
+    """구현(solve) 단계용 같은 유형의 변형 문제 — 재현과 달리 '낯선 표면'에 적용을 검증.
+
+    변형이 없는 유형은 None → 재현 통과가 구현까지 인정된다(동일 활동 중복 방지,
+    2026-07-21 James: "구현 1회 아니냐" — basics 등 변형 부재 유형의 재현=구현 통합).
+    """
+    matches = sorted((p for p in load_problems() if p.type == kata.type), key=lambda p: p.id)
+    return matches[0] if matches else None

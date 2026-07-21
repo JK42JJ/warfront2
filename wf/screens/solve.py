@@ -42,10 +42,13 @@ class SolveScreen(Screen):
         Binding("escape", "back", "홈으로", priority=True),
     ]
 
-    def __init__(self, kata: Kata, mode: str = "recall") -> None:
+    def __init__(self, kata: Kata, mode: str = "recall",
+                 record_as: str | None = None, origin_title: str | None = None) -> None:
         super().__init__()
         self.kata = kata
         self.mode = mode
+        self.record_as = record_as or kata.id      # 변형으로 풀어도 원 카타의 단계로 기록
+        self.origin_title = origin_title
         self.phase = "think"
         self.think_answer = ""
         self.hint_level = 0
@@ -70,7 +73,10 @@ class SolveScreen(Screen):
             desc.append("  방금 익힌 패턴을 기억만으로 다시 쓴다 — 통과해야 '구현' 해금", style="orange1")
         else:
             desc.append(" 구현 모드 ", style="bold black on green")
-            desc.append("  스스로 설계해서 푼다 — 마지막 단계", style="green")
+            if self.origin_title:
+                desc.append(f"  변형 문제로 실전 검증 — 통과하면 '{self.origin_title}' 구현 완료", style="green")
+            else:
+                desc.append("  스스로 설계해서 푼다 — 마지막 단계", style="green")
         desc.append("   (기능이 맞으면 pass · Ctrl+R 채점)", style="dim")
         stmt = Static(statement_text(self.kata), id="stmt-panel")
         stmt.border_title = "문제" if self.kata.statement_lang != "en" else "Problem"
@@ -177,7 +183,14 @@ class SolveScreen(Screen):
                        "elapsed": round(elapsed, 1), "errors": r["total"] - r["passed"],
                        "hints_used": self.hints_used}
             conn = db.connect()
-            db.record_session(conn, self.kata.id, self.mode, summary, self.think_answer)
+            db.record_session(conn, self.record_as, self.mode, summary, self.think_answer)
+            if self.mode == "recall":
+                from wf.content.loader import variant_for
+                if variant_for(self.kata) is None:
+                    # 변형 없는 유형: 재현=구현 동일 활동 → 구현까지 동시 인정 (2026-07-21 정책)
+                    db.record_session(conn, self.record_as, "solve", summary,
+                                      "재현 통과로 구현 동시 인정(변형 부재 유형)")
+                    self.notify("변형 없는 유형 — 재현 통과로 구현까지 인정", timeout=4)
             conn.close()
             self.run_worker(self._sync_career, thread=True)
             text.append("\n\n📗 모범 접근: ", style="bold green")
