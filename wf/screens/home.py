@@ -17,6 +17,9 @@ from wf.content.loader import load_katas
 from wf.store import db
 
 MODE_KO = {"guided": "보고", "cloze": "빈칸", "recall": "재현", "solve": "구현"}
+MODES_ORDER = ("guided", "cloze", "recall", "solve")
+STAGE_KO = ("보", "빈", "재", "구")
+# 아이콘은 절제(2026-07-21 James: "남발하면 쓰레기") — 진행은 도트 글리프(▰▶▱)+텍스트로만
 
 
 class HomeScreen(Screen):
@@ -76,11 +79,11 @@ class HomeScreen(Screen):
                 with Vertical(classes="dash-metric", id="char-block"):
                     yield Static(id="char-panel")
                     yield Static("", id="char-label", classes="stat-label")
+            yield Static(self._course_bar(), id="course-progress")
             table = DataTable(id="kata-table", cursor_type="row")
-            table.add_columns("카타", "설명", "보고", "빈칸", "재현", "구현", "다음 단계")
+            table.add_columns("카타", "설명", "진행 (보고→빈칸→재현→구현)", "다음")
             for kata in load_katas():
                 p = self._progress[kata.id]
-                c = p["counts"]
                 marker = ""
                 if self._sprint:
                     if kata.id in sprint_new:
@@ -88,10 +91,10 @@ class HomeScreen(Screen):
                     elif kata.id in sprint_review:
                         marker = "🔁 "
                 table.add_row(
-                    marker + kata.title, kata.desc or kata.belt,
-                    str(c["guided"]), str(c["cloze"]), str(c["recall"]),
-                    ("✅" if c["solve"] else "—"),
-                    MODE_KO[p["next_mode"]],
+                    marker + kata.title,
+                    Text(kata.desc or kata.belt, style="dim"),
+                    self._progress_cells(p),
+                    self._next_badge(p),
                     key=kata.id,
                 )
             yield table
@@ -105,6 +108,49 @@ class HomeScreen(Screen):
                 help_text.append("유형 인식률 미측정 — i 로 첫 드릴 (지문만 보고 유형 판별)", style="yellow")
             yield Static(help_text, id="dash-help")
         yield Footer()
+
+    # ---------- 도트풍 진행 표시 (2026-07-21 James: 매일 보는 화면 — 진행이 한눈에) ----------
+    def _stage_state(self, p: dict) -> tuple[int, bool]:
+        """(다음 단계 인덱스, 전단계 완료 여부). 구현(solve)은 pass 시에만 기록되므로 counts>0=완료."""
+        return MODES_ORDER.index(p["next_mode"]), p["counts"]["solve"] > 0
+
+    def _progress_cells(self, p: dict) -> Text:
+        """카타 한 줄의 4단계 도트 진행: ▰완료(초록) ▶현재(노랑) ▱잠김(회색) + 횟수."""
+        ni, solved = self._stage_state(p)
+        t = Text()
+        for i, m in enumerate(MODES_ORDER):
+            cnt = p["counts"][m]
+            if (i < ni) or (m == "solve" and solved):
+                t.append(f"▰{STAGE_KO[i]}", style="bold green")
+            elif i == ni and not solved:
+                t.append(f"▶{STAGE_KO[i]}", style="bold yellow")
+            else:
+                t.append(f"▱{STAGE_KO[i]}", style="grey50")
+            t.append(f"{cnt if cnt else '·'}", style="dim")
+            t.append("  ")
+        return t
+
+    def _next_badge(self, p: dict) -> Text:
+        ni, solved = self._stage_state(p)
+        if solved:
+            return Text("완료", style="bold green")
+        return Text(f"▶ {MODE_KO[MODES_ORDER[ni]]}", style="bold yellow")
+
+    def _course_bar(self) -> Text:
+        """과정 전체 진행 — 완료 단계 수 / (카타 수 × 4단계) 픽셀 바."""
+        done = 0
+        for p in self._progress.values():
+            ni, solved = self._stage_state(p)
+            done += 4 if solved else ni
+        total = 4 * max(len(self._progress), 1)
+        width = 30
+        filled = round(width * done / total)
+        t = Text()
+        t.append("과정 진행  ", style="bold")
+        t.append("▰" * filled, style="bold green")
+        t.append("▱" * (width - filled), style="grey35")
+        t.append(f"  {done}/{total} 단계 ({round(100 * done / total)}%)", style="cyan")
+        return t
 
     def on_mount(self) -> None:
         self.query_one(DataTable).focus()
@@ -153,7 +199,7 @@ class HomeScreen(Screen):
             panel.append(line + "\n", style=style)
         self.query_one("#char-panel", Static).update(panel)
         nxt = character.days_to_next(self._streak)
-        label = f"Lv{self._stage} {name}" + (f" · 진화까지 {nxt}일" if nxt is not None else " · 최종 형태")
+        label = f"Lv{self._stage} {name}" + (f" · 진화 D-{nxt}" if nxt is not None else " · 최종")
         self.query_one("#char-label", Static).update(label)
 
     def _open(self, kata_id: str, mode: str) -> None:

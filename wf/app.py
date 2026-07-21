@@ -11,6 +11,8 @@ class WarfrontApp(App):
 
     CSS = """
     Screen { align: center middle; }
+    HomeScreen { align: center top; }   /* 매일 보는 화면 — 위 정렬로 여백 산만함 제거 */
+    #course-progress { height: auto; margin-bottom: 1; }
 
     /* ---- 대시보드(홈) ---- */
     #dash { padding: 1 3; height: auto; width: 100%; }
@@ -22,7 +24,7 @@ class WarfrontApp(App):
     .dash-metric .stat-label { width: 100%; height: 1; text-align: center;
                                color: $text-muted; margin-top: 1; }
     #kata-table { height: auto; max-height: 20; margin-bottom: 1; }
-    #char-block { min-width: 18; }
+    #char-block { min-width: 26; }
     #char-panel { height: auto; width: auto; }
     #dash-help { height: auto; color: $text-muted; text-align: center; width: 100%; }
     #hint-panel { height: auto; border: tall $success; padding: 1 2; margin-top: 1; }

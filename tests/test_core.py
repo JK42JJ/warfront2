@@ -692,7 +692,7 @@ async def test_character_evolution_once(tmp_path, monkeypatch):
         screen = app.screen
         assert screen._stage == 1
         label = str(screen.query_one("#char-label").render())
-        assert "삐약" in label and "진화까지" in label
+        assert "삐약" in label and "진화 D-" in label
         conn = db.connect()
         assert db.get_meta(conn, "char_stage_seen") == "1"  # 재진입 시 중복 축하 없음
         conn.close()
