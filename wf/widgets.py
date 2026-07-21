@@ -107,7 +107,11 @@ _STMT_HEADERS = {
 
 
 def statement_text(kata) -> Text:
-    """지문을 섹션 헤더 강조와 함께 Rich Text로 렌더 (마크업 보간 금지 원칙 준수)."""
+    """지문을 섹션 헤더 강조와 함께 Rich Text로 렌더 (마크업 보간 금지 원칙 준수).
+
+    하단에 출처(원형 기출) 표기 — 어느 플랫폼(백준/프로그래머스/HackerRank 등)의
+    어떤 문제를 원형으로 한 자작 지문인지 밝힌다 (2026-07-21 James).
+    """
     text = Text()
     body = kata.statement or (kata.desc or kata.title)
     for line in body.split("\n"):
@@ -115,4 +119,14 @@ def statement_text(kata) -> Text:
             text.append(line + "\n", style="bold yellow")
         else:
             text.append(line + "\n")
+    if kata.resources:
+        en = getattr(kata, "statement_lang", "ko") == "en"
+        text.append("\n" + ("Source (original problems)" if en else "출처 (원형 기출)") + "\n",
+                    style="bold yellow")
+        for r in kata.resources:
+            text.append("· ", style="dim")
+            text.append(str(r.get("name", "")) + "\n", style="cyan")
+        text.append("Statement rewritten for this trainer; links in the result screen.\n"
+                    if en else "지문은 자작 재구성 — 원문 링크는 결과 화면에 표시됩니다.\n",
+                    style="dim")
     return text

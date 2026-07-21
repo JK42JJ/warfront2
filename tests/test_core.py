@@ -637,6 +637,7 @@ async def test_statement_two_column_layout(tmp_path, monkeypatch):
         rendered = str(stmt.render())
         assert "문제 설명" in rendered or "Problem" in rendered
         assert "제한사항" in rendered or "Constraints" in rendered
+        assert "출처" in rendered or "Source" in rendered  # 원형 기출 표기(2026-07-21)
         # 좌(지문)-우(입력) 나란히: 지문 패널 오른쪽 경계 <= 입력 박스 왼쪽 시작
         think = screen.query_one("#think-box")
         assert stmt.region.x < think.region.x
@@ -648,5 +649,6 @@ async def test_statement_two_column_layout(tmp_path, monkeypatch):
         await pilot.pause()
         stmt = app2.screen.query_one("#stmt-panel")
         rendered = str(stmt.render())
-        # 02_topk는 HackerRank 앵커 → 영문 지문
+        # 02_topk는 HackerRank 앵커 → 영문 지문 + 영문 출처 표기
         assert "Problem" in rendered and "Constraints" in rendered
+        assert "Source" in rendered
