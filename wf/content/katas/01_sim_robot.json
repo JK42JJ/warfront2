@@ -96,6 +96,126 @@
         2,
         2
       ]
+    },
+    {
+      "args": [
+        1,
+        "UDLR"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        3,
+        "DDDDD"
+      ],
+      "expected": [
+        2,
+        0
+      ]
+    },
+    {
+      "args": [
+        3,
+        "RRRRR"
+      ],
+      "expected": [
+        0,
+        2
+      ]
+    },
+    {
+      "args": [
+        2,
+        "DRDRDR"
+      ],
+      "expected": [
+        1,
+        1
+      ]
+    },
+    {
+      "args": [
+        5,
+        "URDL"
+      ],
+      "expected": [
+        1,
+        0
+      ]
+    },
+    {
+      "args": [
+        4,
+        "UUUULLLL"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        3,
+        "RDLURDLURDLURDLURDLU"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        100,
+        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+      ],
+      "expected": [
+        99,
+        0
+      ]
+    },
+    {
+      "args": [
+        100,
+        "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
+      ],
+      "expected": [
+        0,
+        99
+      ]
+    },
+    {
+      "args": [
+        2,
+        "U"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        10,
+        "DRULDRUL"
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        6,
+        "DDRRUULL"
+      ],
+      "expected": [
+        0,
+        0
+      ]
     }
   ],
   "perf": {

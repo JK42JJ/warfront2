@@ -710,3 +710,10 @@ def test_variant_for_and_solve_policy():
     assert v is not None and v.type == "bfs" and v.id.startswith("v-")
     assert variant_for(get_kata("py-parse")) is None      # basics — 변형 없음
     assert variant_for(get_kata("dijkstra")) is None      # 변형 미제작 유형
+
+
+def test_min_test_cases_per_item():
+    """검증 강도 게이트(2026-07-21 James: "예제 15개 이상"): 전 문항 테스트 15케이스 이상."""
+    from wf.content.loader import load_katas, load_problems
+    for k in load_katas() + load_problems():
+        assert len(k.tests) >= 15, f"{k.id}: {len(k.tests)}케이스 (<15)"

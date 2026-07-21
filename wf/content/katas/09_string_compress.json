@@ -68,6 +68,78 @@
         "aabbaa"
       ],
       "expected": "a2b2a2"
+    },
+    {
+      "args": [
+        "a"
+      ],
+      "expected": "a"
+    },
+    {
+      "args": [
+        "aa"
+      ],
+      "expected": "a2"
+    },
+    {
+      "args": [
+        "aaa"
+      ],
+      "expected": "a3"
+    },
+    {
+      "args": [
+        "ab"
+      ],
+      "expected": "ab"
+    },
+    {
+      "args": [
+        "aabb"
+      ],
+      "expected": "a2b2"
+    },
+    {
+      "args": [
+        "abab"
+      ],
+      "expected": "abab"
+    },
+    {
+      "args": [
+        "zzzzzzzzzz"
+      ],
+      "expected": "z10"
+    },
+    {
+      "args": [
+        "aabbaa"
+      ],
+      "expected": "a2b2a2"
+    },
+    {
+      "args": [
+        "abcabc"
+      ],
+      "expected": "abcabc"
+    },
+    {
+      "args": [
+        "aaaaaaaaaaaab"
+      ],
+      "expected": "a12b"
+    },
+    {
+      "args": [
+        "babababababababababa"
+      ],
+      "expected": "babababababababababa"
+    },
+    {
+      "args": [
+        "cccaaa"
+      ],
+      "expected": "c3a3"
     }
   ],
   "perf": {

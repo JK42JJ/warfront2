@@ -65,6 +65,264 @@
       "expected": {
         "WARN": 1
       }
+    },
+    {
+      "args": [
+        []
+      ],
+      "expected": {}
+    },
+    {
+      "args": [
+        [
+          "10:00 INFO ok"
+        ]
+      ],
+      "expected": {
+        "INFO": 1
+      }
+    },
+    {
+      "args": [
+        [
+          "a ERROR x",
+          "b ERROR y",
+          "c ERROR z"
+        ]
+      ],
+      "expected": {
+        "ERROR": 3
+      }
+    },
+    {
+      "args": [
+        [
+          "1 A m",
+          "2 B m",
+          "3 A m",
+          "4 C m",
+          "5 B m",
+          "6 A m"
+        ]
+      ],
+      "expected": {
+        "A": 3,
+        "B": 2,
+        "C": 1
+      }
+    },
+    {
+      "args": [
+        [
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m",
+          "t L1 m"
+        ]
+      ],
+      "expected": {
+        "L1": 50
+      }
+    },
+    {
+      "args": [
+        [
+          "0 L0 m",
+          "1 L1 m",
+          "2 L2 m",
+          "3 L0 m",
+          "4 L1 m",
+          "5 L2 m",
+          "6 L0 m",
+          "7 L1 m",
+          "8 L2 m",
+          "9 L0 m",
+          "10 L1 m",
+          "11 L2 m",
+          "12 L0 m",
+          "13 L1 m",
+          "14 L2 m",
+          "15 L0 m",
+          "16 L1 m",
+          "17 L2 m",
+          "18 L0 m",
+          "19 L1 m",
+          "20 L2 m",
+          "21 L0 m",
+          "22 L1 m",
+          "23 L2 m",
+          "24 L0 m",
+          "25 L1 m",
+          "26 L2 m",
+          "27 L0 m",
+          "28 L1 m",
+          "29 L2 m"
+        ]
+      ],
+      "expected": {
+        "L0": 10,
+        "L1": 10,
+        "L2": 10
+      }
+    },
+    {
+      "args": [
+        [
+          "00:00 WARN disk-full",
+          "00:01 WARN disk-full"
+        ]
+      ],
+      "expected": {
+        "WARN": 2
+      }
+    },
+    {
+      "args": [
+        [
+          "x DEBUG a",
+          "y INFO b",
+          "z ERROR c",
+          "w CRIT d"
+        ]
+      ],
+      "expected": {
+        "DEBUG": 1,
+        "INFO": 1,
+        "ERROR": 1,
+        "CRIT": 1
+      }
+    },
+    {
+      "args": [
+        [
+          "00:00 ERROR m",
+          "01:00 INFO m",
+          "02:00 INFO m",
+          "03:00 INFO m",
+          "04:00 ERROR m",
+          "05:00 INFO m",
+          "06:00 INFO m",
+          "07:00 INFO m",
+          "08:00 ERROR m",
+          "09:00 INFO m",
+          "10:00 INFO m",
+          "11:00 INFO m",
+          "12:00 ERROR m",
+          "13:00 INFO m",
+          "14:00 INFO m",
+          "15:00 INFO m",
+          "16:00 ERROR m",
+          "17:00 INFO m",
+          "18:00 INFO m",
+          "19:00 INFO m"
+        ]
+      ],
+      "expected": {
+        "ERROR": 5,
+        "INFO": 15
+      }
+    },
+    {
+      "args": [
+        [
+          "9:9 UP m"
+        ]
+      ],
+      "expected": {
+        "UP": 1
+      }
+    },
+    {
+      "args": [
+        [
+          "a B c",
+          "d B e",
+          "f G h",
+          "i B j"
+        ]
+      ],
+      "expected": {
+        "B": 3,
+        "G": 1
+      }
+    },
+    {
+      "args": [
+        [
+          "t LV0 m",
+          "t LV1 m",
+          "t LV2 m",
+          "t LV3 m",
+          "t LV4 m",
+          "t LV5 m",
+          "t LV6 m",
+          "t LV7 m",
+          "t LV8 m",
+          "t LV9 m",
+          "t LV10 m",
+          "t LV11 m"
+        ]
+      ],
+      "expected": {
+        "LV0": 1,
+        "LV1": 1,
+        "LV2": 1,
+        "LV3": 1,
+        "LV4": 1,
+        "LV5": 1,
+        "LV6": 1,
+        "LV7": 1,
+        "LV8": 1,
+        "LV9": 1,
+        "LV10": 1,
+        "LV11": 1
+      }
     }
   ],
   "perf": {
