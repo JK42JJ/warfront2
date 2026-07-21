@@ -215,7 +215,7 @@ async def test_dashboard_and_hint_flow(tmp_path, monkeypatch):
     async with app.run_test(size=(120, 50)) as pilot:
         # 대시보드: 카타 테이블 존재 + 일차 표시
         assert app.screen.query_one("#kata-table") is not None
-        assert app.screen.query_one("#day-digits") is not None
+        assert app.screen.query_one("#course-progress") is not None
         await pilot.press("enter")           # 첫 행 선택 → 카타
         await pilot.pause()
         screen = app.screen
@@ -664,9 +664,14 @@ def test_character_stages():
     assert character.stage_for(120) == 9
     assert character.days_to_next(3) == 2
     assert character.days_to_next(45) is None
+    heights = []
     for s in range(len(character.STAGES)):
-        for t in (0, 1):
-            assert character.idle_frame(s, t).count("\n") == 4
+        h0 = character.idle_frame(s, 0).count("\n")
+        assert character.idle_frame(s, 1).count("\n") == h0  # 프레임 간 줄수 동일
+        heights.append(h0)
+    assert heights == sorted(heights)          # 단계가 오를수록 실루엣이 커진다(성장 체감)
+    assert heights[-1] > heights[0]
+    assert len({character.stage_color(s) for s in range(10)}) == 10  # 단계 색 전부 상이
     assert character.evolution_frames(1)[-1] == character.idle_frame(1, 0)
 
 

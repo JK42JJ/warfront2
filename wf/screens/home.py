@@ -10,7 +10,7 @@ from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import DataTable, Digits, Footer, Static
+from textual.widgets import DataTable, Footer, Static
 
 from wf import character
 from wf.content.loader import load_katas
@@ -19,7 +19,8 @@ from wf.store import db
 MODE_KO = {"guided": "보고", "cloze": "빈칸", "recall": "재현", "solve": "구현"}
 MODES_ORDER = ("guided", "cloze", "recall", "solve")
 STAGE_KO = ("보", "빈", "재", "구")
-# 아이콘은 절제(2026-07-21 James: "남발하면 쓰레기") — 진행은 도트 글리프(▰▶▱)+텍스트로만
+STAGE_COLOR = ("cyan", "magenta", "orange1", "green")   # 단계 고유색 4가지 (2026-07-21 James)
+STAGE_EMOJI = ("👀", "🧩", "🧠", "⚔")                    # 아이콘은 헤더 범례 1곳에만 (절제 원칙)
 
 
 class HomeScreen(Screen):
@@ -54,59 +55,66 @@ class HomeScreen(Screen):
             sprint_review = day_plan.get("review", [])
 
         with Vertical(id="dash"):
+            # ── 헤더 한 줄: 제목 · 일차 · 스트릭 (색은 여기서 절제 — 표의 4단계색이 주인공)
             head = Text()
-            head.append("⚔ WARFRONT 2", style="bold cyan")
-            head.append("   50일 코딩테스트 훈련", style="dim")
+            head.append("⚔ WARFRONT 2", style="bold")
+            head.append("  ·  50일 코딩테스트 훈련", style="dim")
+            head.append(f"      D{day}", style="bold")
+            head.append("/50", style="dim")
+            head.append(f"   연속 {streak}일", style="bold" if streak else "dim")
             yield Static(head, id="dash-head")
             if self._sprint:
                 sd = self._sprint["day"]
                 sp = Text()
                 if sd <= 7:
-                    d = str(sd)
-                    sp.append(f"⚡ 속성 모드 D{sd}/7", style="bold yellow")
-                    sp.append(f" — 오늘: {self._sprint_plan['plan'][d]['focus']}", style="yellow")
-                    sp.append("   (t로 해제)", style="dim")
+                    sp.append(f"⚡ 속성 D{sd}/7 — {self._sprint_plan['plan'][str(sd)]['focus']}",
+                              style="yellow")
+                    sp.append("  (t 해제)", style="dim")
                 else:
-                    sp.append("⚡ 속성 7일 완료 — 실전 응시 단계. t로 해제", style="bold yellow")
+                    sp.append("⚡ 속성 7일 완료 — 실전 응시 단계 (t 해제)", style="yellow")
                 yield Static(sp, id="sprint-banner")
-            with Horizontal(id="dash-top"):
-                with Vertical(classes="dash-metric"):
-                    yield Digits(f"{day}", id="day-digits")
-                    yield Static(f"일차 / 50일", classes="stat-label")
-                with Vertical(classes="dash-metric"):
-                    yield Digits(f"{streak}", id="streak-digits")
-                    yield Static("연속 훈련일", classes="stat-label")
-                with Vertical(classes="dash-metric", id="char-block"):
+            with Horizontal(id="main-cols"):
+                # ── 좌: 카타 테이블 (핵심 작업 영역)
+                with Vertical(id="left-col"):
+                    table = DataTable(id="kata-table", cursor_type="row")
+                    prog_head = Text()
+                    for i, ko in enumerate(("보고", "빈칸", "재현", "구현")):
+                        prog_head.append(ko, style=f"bold {STAGE_COLOR[i]}")
+                        if i < 3:
+                            prog_head.append("·", style="dim")
+                    table.add_columns("카타", "설명", prog_head, "다음")
+                    for kata in load_katas():
+                        p = self._progress[kata.id]
+                        marker = ""
+                        if self._sprint:
+                            if kata.id in sprint_new:
+                                marker = "⚡ "
+                            elif kata.id in sprint_review:
+                                marker = "🔁 "
+                        table.add_row(
+                            marker + kata.title,
+                            Text((kata.desc or kata.belt)[:26], style="grey50"),
+                            self._progress_cells(p),
+                            self._next_badge(p),
+                            key=kata.id,
+                        )
+                    yield table
+                    yield Static("", id="row-detail")
+                # ── 우: 관측 패널 (캐릭터 · 과정 진행 · 인식률)
+                with Vertical(id="side-col"):
                     yield Static(id="char-panel")
-                    yield Static("", id="char-label", classes="stat-label")
-            yield Static(self._course_bar(), id="course-progress")
-            table = DataTable(id="kata-table", cursor_type="row")
-            table.add_columns("카타", "설명", "진행 (보고→빈칸→재현→구현)", "다음")
-            for kata in load_katas():
-                p = self._progress[kata.id]
-                marker = ""
-                if self._sprint:
-                    if kata.id in sprint_new:
-                        marker = "⚡ "
-                    elif kata.id in sprint_review:
-                        marker = "🔁 "
-                table.add_row(
-                    marker + kata.title,
-                    Text(kata.desc or kata.belt, style="dim"),
-                    self._progress_cells(p),
-                    self._next_badge(p),
-                    key=kata.id,
-                )
-            yield table
-            help_text = Text()
-            help_text.append("⏎ 다음 단계 자동 · g/b/r/s 모드 · i 인식 드릴 · t 속성 7일 · q 종료\n", style="dim")
-            if self._recog["rate"] is not None:
-                style = "green" if self._recog["rate"] >= 90 else "yellow"
-                help_text.append(f"유형 인식률 {self._recog['rate']}% (n={self._recog['total']}) — 목표 90%+",
-                                 style=style)
-            else:
-                help_text.append("유형 인식률 미측정 — i 로 첫 드릴 (지문만 보고 유형 판별)", style="yellow")
-            yield Static(help_text, id="dash-help")
+                    yield Static("", id="char-label")
+                    yield Static(self._course_bar(), id="course-progress")
+                    recog = Text()
+                    if self._recog["rate"] is not None:
+                        ok = self._recog["rate"] >= 90
+                        recog.append("유형 인식률  ", style="dim")
+                        recog.append(f"{self._recog['rate']}%", style="bold green" if ok else "bold yellow")
+                        recog.append(f"  (n={self._recog['total']} · 목표 90%)", style="dim")
+                    else:
+                        recog.append("유형 인식률  — ", style="dim")
+                        recog.append(" i 로 첫 드릴", style="yellow")
+                    yield Static(recog, id="recog-line")
         yield Footer()
 
     # ---------- 도트풍 진행 표시 (2026-07-21 James: 매일 보는 화면 — 진행이 한눈에) ----------
@@ -119,22 +127,21 @@ class HomeScreen(Screen):
         ni, solved = self._stage_state(p)
         t = Text()
         for i, m in enumerate(MODES_ORDER):
-            cnt = p["counts"][m]
+            col = STAGE_COLOR[i]
             if (i < ni) or (m == "solve" and solved):
-                t.append(f"▰ {STAGE_KO[i]}", style="bold green")
+                t.append("▰", style=f"bold {col}")
             elif i == ni and not solved:
-                t.append(f"▶ {STAGE_KO[i]}", style="bold yellow")
+                t.append("▶", style=f"bold {col}")
             else:
-                t.append(f"▱ {STAGE_KO[i]}", style="grey50")
-            t.append(f"{cnt if cnt else '·'}", style="dim")
-            t.append("  ")
+                t.append("▱", style="grey35")
+            t.append(" ")
         return t
 
     def _next_badge(self, p: dict) -> Text:
         ni, solved = self._stage_state(p)
         if solved:
             return Text("완료", style="bold green")
-        return Text(f"▶ {MODE_KO[MODES_ORDER[ni]]}", style="bold yellow")
+        return Text(f"▶ {MODE_KO[MODES_ORDER[ni]]}", style=f"bold {STAGE_COLOR[ni]}")
 
     def _course_bar(self) -> Text:
         """과정 전체 진행 — 완료 단계 수 / (카타 수 × 4단계) 픽셀 바."""
@@ -143,14 +150,42 @@ class HomeScreen(Screen):
             ni, solved = self._stage_state(p)
             done += 4 if solved else ni
         total = 4 * max(len(self._progress), 1)
-        width = 30
+        width = 26
         filled = round(width * done / total)
         t = Text()
-        t.append("과정 진행  ", style="bold")
+        t.append("과정 진행  ", style="dim")
+        t.append(f"{done}/{total} 단계", style="bold")
+        t.append(f"  ({round(100 * done / total)}%)\n", style="dim")
         t.append("▰" * filled, style="bold green")
         t.append("▱" * (width - filled), style="grey35")
-        t.append(f"  {done}/{total} 단계 ({round(100 * done / total)}%)", style="cyan")
         return t
+
+    def _update_row_detail(self, kata_id: str) -> None:
+        """커서가 놓인 카타의 상세 — 표에서 걷어낸 횟수·최고 정확도는 여기서 보존."""
+        from wf.content.loader import get_kata
+        p = self._progress.get(kata_id)
+        if not p:
+            return
+        k = get_kata(kata_id)
+        t = Text()
+        t.append(f"{k.title}", style="bold")
+        t.append("   ")
+        for i, m in enumerate(MODES_ORDER):
+            cnt, acc = p["counts"][m], p["best_acc"][m]
+            t.append(MODE_KO[m], style=f"bold {STAGE_COLOR[i]}")
+            if cnt:
+                t.append(f" {cnt}회", style="")
+                t.append(f"({int(acc)}%)" if m != "solve" else "", style="dim")
+            else:
+                t.append(" —", style="grey42")
+            if i < 3:
+                t.append("  ·  ", style="grey35")
+        t.append("      ⏎ 다음 단계 시작", style="dim")
+        self.query_one("#row-detail", Static).update(t)
+
+    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
+        if event.row_key is not None and event.row_key.value:
+            self._update_row_detail(event.row_key.value)
 
     def on_mount(self) -> None:
         self.query_one(DataTable).focus()
@@ -193,7 +228,7 @@ class HomeScreen(Screen):
             style = "bold yellow"
         else:
             art = character.idle_frame(self._stage, self._tick)
-            style = "cyan"
+            style = f"bold {character.stage_color(self._stage)}"
         panel = Text()
         for line in art.split("\n"):
             panel.append(line + "\n", style=style)

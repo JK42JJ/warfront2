@@ -14,19 +14,18 @@ class WarfrontApp(App):
     HomeScreen { align: center top; }   /* 매일 보는 화면 — 위 정렬로 여백 산만함 제거 */
     #course-progress { height: auto; margin-bottom: 1; }
 
-    /* ---- 대시보드(홈) ---- */
-    #dash { padding: 1 3; height: auto; width: 100%; }
-    #dash-head { height: auto; margin-bottom: 1; }
-    #sprint-banner { height: auto; margin-bottom: 1; }
-    #dash-top { height: auto; align-horizontal: center; margin-bottom: 1; }
-    .dash-metric { width: auto; height: auto; margin: 0 4; }
-    .dash-metric Digits { width: auto; color: $warning; }
-    .dash-metric .stat-label { width: 100%; height: 1; text-align: center;
-                               color: $text-muted; margin-top: 1; }
-    #kata-table { height: auto; max-height: 20; margin-bottom: 1; }
-    #char-block { min-width: 26; }
-    #char-panel { height: auto; width: auto; }
-    #dash-help { height: auto; color: $text-muted; text-align: center; width: 100%; }
+    /* ---- 대시보드(홈): 좌 작업(테이블) / 우 관측(캐릭터·진행) 콕핏 ---- */
+    #dash { padding: 1 2; height: auto; width: 100%; }
+    #dash-head { height: 1; margin-bottom: 1; }
+    #sprint-banner { height: 1; margin-bottom: 1; }
+    #main-cols { height: auto; }
+    #left-col { width: 1fr; height: auto; }
+    #side-col { width: 36; height: auto; padding: 1 0 0 3; }
+    #kata-table { height: auto; max-height: 22; }
+    #row-detail { height: auto; margin-top: 1; }
+    #char-panel { height: auto; width: 100%; padding-left: 6; }
+    #char-label { height: auto; width: 100%; color: $text-muted; margin: 1 0; }
+    #recog-line { height: auto; margin-top: 1; }
     #hint-panel { height: auto; border: tall $success; padding: 1 2; margin-top: 1; }
     #diagram-panel { height: auto; border: tall $accent; padding: 1 2; margin-top: 1; }
 
