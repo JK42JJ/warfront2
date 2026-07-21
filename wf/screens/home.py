@@ -1,7 +1,8 @@
 """홈 = 대시보드 — 50일 진행 + 카타별 단계 현황(보고/빈칸/재현/구현 횟수).
 
-James 설계(2026-07-20): 앱을 열면 대시보드. 사실 기반 카운트(게임화 배제).
+James 설계(2026-07-20): 앱을 열면 대시보드. 사실 기반 카운트.
 단계: 보고 따라치기 → 빈칸 채우기 → 안 보고 재현 → 스스로 구현 (리서치: faded worked examples)
+성장 캐릭터(2026-07-21 James): 스트릭 5일마다 진화하는 레트로 도트 캐릭터 — 보상·동기유발.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import DataTable, Digits, Footer, Static
 
+from wf import character
 from wf.content.loader import load_katas
 from wf.store import db
 
@@ -71,6 +73,9 @@ class HomeScreen(Screen):
                 with Vertical(classes="dash-metric"):
                     yield Digits(f"{streak}", id="streak-digits")
                     yield Static("연속 훈련일", classes="stat-label")
+                with Vertical(classes="dash-metric", id="char-block"):
+                    yield Static(id="char-panel")
+                    yield Static("", id="char-label", classes="stat-label")
             table = DataTable(id="kata-table", cursor_type="row")
             table.add_columns("카타", "설명", "보고", "빈칸", "재현", "구현", "다음 단계")
             for kata in load_katas():
@@ -103,6 +108,53 @@ class HomeScreen(Screen):
 
     def on_mount(self) -> None:
         self.query_one(DataTable).focus()
+        self._char_init()
+
+    # ---------- 성장 캐릭터 (스트릭 5일마다 진화 — 보상·동기유발) ----------
+    def _char_init(self) -> None:
+        conn = db.connect()
+        self._streak = db.get_streak(conn)
+        self._stage = character.stage_for(self._streak)
+        seen_raw = db.get_meta(conn, "char_stage_seen")
+        if seen_raw is None:
+            # 최초 실행/업그레이드: 조용히 현재 단계로 동기화 (설치 직후 축하 방지)
+            db.set_meta(conn, "char_stage_seen", str(self._stage))
+            seen = self._stage
+        else:
+            seen = int(seen_raw)
+        self._tick = 0
+        self._evo_frames: list[str] = []
+        if self._stage > seen:
+            self._evo_frames = character.evolution_frames(self._stage)
+            db.set_meta(conn, "char_stage_seen", str(self._stage))
+            name, lore = character.stage_info(self._stage)
+            self.notify(f"🎉 진화! Lv{self._stage} {name} — {lore}", timeout=6)
+        conn.close()
+        self._char_render()
+        self.set_interval(0.5, self._char_tick)
+
+    def _char_tick(self) -> None:
+        self._tick += 1
+        self._char_render()
+
+    def _char_render(self) -> None:
+        name, _ = character.stage_info(self._stage)
+        if self._evo_frames:
+            art = self._evo_frames.pop(0) if len(self._evo_frames) > 1 else self._evo_frames[0]
+            if len(self._evo_frames) == 1:
+                # 마지막(새 모습) 프레임에 도달 — 다음 틱부터 idle로 전환
+                self._evo_frames = []
+            style = "bold yellow"
+        else:
+            art = character.idle_frame(self._stage, self._tick)
+            style = "cyan"
+        panel = Text()
+        for line in art.split("\n"):
+            panel.append(line + "\n", style=style)
+        self.query_one("#char-panel", Static).update(panel)
+        nxt = character.days_to_next(self._streak)
+        label = f"Lv{self._stage} {name}" + (f" · 진화까지 {nxt}일" if nxt is not None else " · 최종 형태")
+        self.query_one("#char-label", Static).update(label)
 
     def _open(self, kata_id: str, mode: str) -> None:
         from wf.content.loader import get_kata

@@ -652,3 +652,47 @@ async def test_statement_two_column_layout(tmp_path, monkeypatch):
         # 02_topk는 HackerRank 앵커 → 영문 지문 + 영문 출처 표기
         assert "Problem" in rendered and "Constraints" in rendered
         assert "Source" in rendered
+
+
+def test_character_stages():
+    """성장 캐릭터(2026-07-21): 5일마다 진화, 프레임 줄 수 고정(레이아웃 안정)."""
+    from wf import character
+    assert character.stage_for(0) == 0
+    assert character.stage_for(4) == 0
+    assert character.stage_for(5) == 1
+    assert character.stage_for(49) == 9
+    assert character.stage_for(120) == 9
+    assert character.days_to_next(3) == 2
+    assert character.days_to_next(45) is None
+    for s in range(len(character.STAGES)):
+        for t in (0, 1):
+            assert character.idle_frame(s, t).count("\n") == 4
+    assert character.evolution_frames(1)[-1] == character.idle_frame(1, 0)
+
+
+@pytest.mark.asyncio
+async def test_character_evolution_once(tmp_path, monkeypatch):
+    """스트릭 5 도달 후 첫 홈 진입: 단계 상승 + meta 갱신(같은 단계 중복 축하 방지)."""
+    from datetime import date, timedelta
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    conn = db.connect()
+    for i in range(5):
+        d = (date.today() - timedelta(days=i)).isoformat()
+        conn.execute(
+            "INSERT INTO sessions (day, kata_id, mode, wpm, accuracy, elapsed, errors, think_answer)"
+            " VALUES (?,?,?,?,?,?,?,?)", (d, "bfs-grid", "guided", 30, 99, 60, 1, "t"))
+    conn.commit()
+    db.set_meta(conn, "char_stage_seen", "0")
+    conn.close()
+
+    from wf.app import WarfrontApp
+    app = WarfrontApp()
+    async with app.run_test(size=(140, 50)) as pilot:
+        await pilot.pause()
+        screen = app.screen
+        assert screen._stage == 1
+        label = str(screen.query_one("#char-label").render())
+        assert "삐약" in label and "진화까지" in label
+        conn = db.connect()
+        assert db.get_meta(conn, "char_stage_seen") == "1"  # 재진입 시 중복 축하 없음
+        conn.close()

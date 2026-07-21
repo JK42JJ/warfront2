@@ -22,6 +22,8 @@ class WarfrontApp(App):
     .dash-metric .stat-label { width: 100%; height: 1; text-align: center;
                                color: $text-muted; margin-top: 1; }
     #kata-table { height: auto; max-height: 20; margin-bottom: 1; }
+    #char-block { min-width: 18; }
+    #char-panel { height: auto; width: auto; }
     #dash-help { height: auto; color: $text-muted; text-align: center; width: 100%; }
     #hint-panel { height: auto; border: tall $success; padding: 1 2; margin-top: 1; }
     #diagram-panel { height: auto; border: tall $accent; padding: 1 2; margin-top: 1; }

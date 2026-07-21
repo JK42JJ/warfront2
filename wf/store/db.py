@@ -123,6 +123,16 @@ def today_session_count(conn: sqlite3.Connection) -> int:
     ).fetchone()[0]
 
 
+def get_meta(conn: sqlite3.Connection, key: str, default: str | None = None) -> str | None:
+    row = conn.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()
+    return row[0] if row else default
+
+
+def set_meta(conn: sqlite3.Connection, key: str, value: str) -> None:
+    conn.execute("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", (key, str(value)))
+    conn.commit()
+
+
 def dump_sessions(conn: sqlite3.Connection) -> list[dict]:
     """전체 세션을 복원 가능한 형태로 덤프 (records repo 백업용)."""
     rows = conn.execute(
