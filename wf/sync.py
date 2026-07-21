@@ -80,6 +80,34 @@ def push_records_repo() -> str:
         return f"기록 repo 오류 무시: {type(e).__name__}"
 
 
+def save_levelup_screenshot(svg: str, stage: int, name: str) -> str:
+    """레벨업(진화) 순간의 대시보드 스크린샷을 기록 repo에 커밋 (2026-07-21 James).
+
+    levelups/YYYY-MM-DD-lvN-이름.svg — GitHub에서 바로 렌더되는 성장 앨범이 된다.
+    실패는 조용히(훈련 흐름 방해 금지).
+    """
+    from wf.store.db import DB_DIR
+    if not (DB_DIR / ".git").exists():
+        return "기록 repo 미설정"
+    try:
+        shots = DB_DIR / "levelups"
+        shots.mkdir(exist_ok=True)
+        fname = f"{date.today().isoformat()}-lv{stage}-{name.replace(' ', '-')}.svg"
+        (shots / fname).write_text(svg, encoding="utf-8")
+
+        def git(*a):
+            return subprocess.run(["git", "-C", str(DB_DIR), *a],
+                                  capture_output=True, text=True, timeout=30)
+        git("add", f"levelups/{fname}")
+        if git("diff", "--cached", "--quiet").returncode != 0:
+            git("commit", "-q", "-m", f"레벨업 Lv{stage} {name} — {date.today().isoformat()} 스크린샷")
+            push = git("push", "-q", "-u", "origin", "main")
+            return "레벨업 스크린샷 push 완료" if push.returncode == 0 else "레벨업 커밋됨·push는 다음에"
+        return "변경 없음"
+    except Exception as e:
+        return f"레벨업 기록 오류 무시: {type(e).__name__}"
+
+
 def export_and_push(repo: Path | None = None) -> str:
     """오늘 집계를 career repo에 기록하고 best-effort push. 반환: 상태 문자열."""
     repo = repo or CAREER_REPO

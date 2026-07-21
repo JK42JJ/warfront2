@@ -217,6 +217,23 @@ class HomeScreen(Screen):
     def _char_tick(self) -> None:
         self._tick += 1
         self._char_render()
+        if getattr(self, "_levelup_shot_due", False):
+            self._levelup_shot_due = False
+            try:
+                svg = self.app.export_screenshot()
+                stage, (name, _) = self._stage, character.stage_info(self._stage)
+                def _push() -> None:
+                    try:
+                        from wf import sync
+                        msg = sync.save_levelup_screenshot(svg, stage, name)
+                        if "push 완료" in msg:
+                            self.app.call_from_thread(
+                                self.notify, "레벨업 스크린샷을 기록 repo에 올렸습니다", timeout=4)
+                    except Exception:
+                        pass   # 기록 실패가 훈련을 방해하지 않는다
+                self.run_worker(_push, thread=True)
+            except Exception:
+                pass
 
     def _char_render(self) -> None:
         name, _ = character.stage_info(self._stage)
@@ -225,6 +242,7 @@ class HomeScreen(Screen):
             if len(self._evo_frames) == 1:
                 # 마지막(새 모습) 프레임에 도달 — 다음 틱부터 idle로 전환
                 self._evo_frames = []
+                self._levelup_shot_due = True   # 새 모습이 그려진 뒤 스크린샷 → 기록 repo
             style = "bold yellow"
         else:
             art = character.idle_frame(self._stage, self._tick)

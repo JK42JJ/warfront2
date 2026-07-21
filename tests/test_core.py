@@ -717,3 +717,49 @@ def test_min_test_cases_per_item():
     from wf.content.loader import load_katas, load_problems
     for k in load_katas() + load_problems():
         assert len(k.tests) >= 15, f"{k.id}: {len(k.tests)}케이스 (<15)"
+
+
+def test_levelup_screenshot_saved(tmp_path, monkeypatch):
+    """레벨업 스크린샷(2026-07-21): 기록 repo에 levelups/ 파일 생성·커밋 (push 실패는 무시)."""
+    import subprocess
+    from wf.store import db as _db
+    from wf import sync
+    repo = tmp_path / "wfhome"
+    repo.mkdir()
+    subprocess.run(["git", "-C", str(repo), "init", "-q", "-b", "main"], check=True)
+    subprocess.run(["git", "-C", str(repo), "commit", "-q", "--allow-empty", "-m", "init"], check=True)
+    monkeypatch.setattr(_db, "DB_DIR", repo)
+    msg = sync.save_levelup_screenshot("<svg>demo</svg>", 1, "삐약 수련생")
+    assert "레벨업" in msg or "변경" in msg
+    files = list((repo / "levelups").glob("*-lv1-*.svg"))
+    assert len(files) == 1 and files[0].read_text() == "<svg>demo</svg>"
+    log = subprocess.run(["git", "-C", str(repo), "log", "--oneline"],
+                         capture_output=True, text=True).stdout
+    assert "레벨업 Lv1" in log
+
+
+@pytest.mark.asyncio
+async def test_levelup_capture_flow(tmp_path, monkeypatch):
+    """진화 연출 종료 시 스크린샷 캡처가 발동하고 예외 없이 지나가는지."""
+    from datetime import date, timedelta
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    conn = db.connect()
+    for i in range(5):
+        d = (date.today() - timedelta(days=i)).isoformat()
+        conn.execute(
+            "INSERT INTO sessions (day, kata_id, mode, wpm, accuracy, elapsed, errors, think_answer)"
+            " VALUES (?,?,?,?,?,?,?,?)", (d, "bfs-grid", "guided", 30, 99, 60, 1, "t"))
+    conn.commit()
+    db.set_meta(conn, "char_stage_seen", "0")
+    conn.close()
+    captured = []
+    from wf import sync
+    monkeypatch.setattr(sync, "save_levelup_screenshot",
+                        lambda svg, stage, name: captured.append((stage, name)) or "레벨업 스크린샷 push 완료")
+    from wf.app import WarfrontApp
+    app = WarfrontApp()
+    async with app.run_test(size=(140, 50)) as pilot:
+        # 진화 프레임(0.5s×4)과 워커가 소화될 때까지
+        for _ in range(8):
+            await pilot.pause(0.5)
+        assert captured and captured[0][0] == 1
