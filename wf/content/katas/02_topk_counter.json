@@ -139,5 +139,7 @@
     "frames": [
       "words = [a, b, a, c, a, b, ...]          N개\n   │\n   ▼  Counter(words)                     O(N)\n{ a:3, b:2, c:1, ... }                   해시(빈도표)\n   │\n   ▼  heapq.nsmallest(k, key=(-빈도, 이름))   O(N log K)\n[ (a,3), (b,2) ]                         상위 K만\n\n✗ 전체 정렬 sorted(...)  = O(N log N)  ← K≪N이면 낭비\n✓ 힙 크기 K 유지         = O(N log K)  ← 이게 기대 복잡도"
     ]
-  }
+  },
+  "statement": "Problem\nYou are given a list of words and an integer k. Determine the k most frequent words.\n\nReturn the answer as a list of [word, count] pairs, sorted by count in descending order. If two words have the same count, the lexicographically smaller word comes first.\n\nFunction Description\nComplete the function top_k in the editor.\ntop_k has the following parameters:\n- string words[n]: the words to analyze\n- int k: the number of top entries to return\n\nReturns\n- [word, count][]: k pairs, ordered as described above\n\nConstraints\n- 1 ≤ n ≤ 200,000\n- 1 ≤ k ≤ number of distinct words\n- Each word consists of lowercase letters and digits.\n\nSample Input\nwords = [\"a\", \"b\", \"a\", \"c\", \"a\", \"b\"], k = 2\n\nSample Output\n[[\"a\", 3], [\"b\", 2]]\n\nExplanation\n\"a\" appears 3 times and \"b\" twice. \"c\" (1 time) is not in the top 2.",
+  "statement_lang": "en"
 }

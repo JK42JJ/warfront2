@@ -155,5 +155,7 @@
       "name": "HackerRank — Prim's MST (짝 개념)",
       "url": "https://www.hackerrank.com/challenges/primsmstsub/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\nn개의 도시가 0번부터 n−1번까지 있습니다. edges의 각 원소 [u, v, w]는 도시 u와 v를 잇는 양방향 도로이며 통행 비용이 w입니다. 출발 도시 src에서 도착 도시 dst까지 가는 최소 비용을 구하려 합니다.\n\nn, edges, src, dst가 주어질 때 최소 비용을 반환하고, 도달할 수 없으면 -1을 반환하도록 dijkstra 함수를 작성하세요.\n\n제한사항\n- 1 ≤ n ≤ 100,000\n- 0 ≤ edges의 길이 ≤ 200,000\n- 1 ≤ w ≤ 10,000 (비용은 모두 양수 — 간선 비용이 다르므로 단순 BFS로는 풀 수 없습니다)\n\n입출력 예\nn = 3, edges = [[0,1,4],[0,2,1],[2,1,2]], src = 0, dst = 1  →  result = 3\nn = 2, edges = [], src = 0, dst = 1                          →  result = -1\n\n입출력 예 설명\n예제 #1: 0→1 직행은 4지만, 0→2→1 경로는 1+2 = 3으로 더 쌉니다.",
+  "statement_lang": "ko"
 }

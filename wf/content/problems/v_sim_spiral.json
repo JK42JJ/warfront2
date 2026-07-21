@@ -73,5 +73,7 @@
       "name": "HackerRank — Matrix Layer Rotation",
       "url": "https://www.hackerrank.com/challenges/matrix-rotation-algo/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\nn×n 격자를 왼쪽 위에서 시작해 시계방향 나선을 그리며 1부터 n²까지 순서대로 채우려 합니다. 오른쪽→아래→왼쪽→위 순서로 진행하다가 격자 밖이거나 이미 채운 칸을 만나면 시계방향으로 방향을 바꿉니다.\n\nn이 주어질 때 채워진 2차원 배열을 반환하도록 snail 함수를 작성하세요.\n\n제한사항\n- 1 ≤ n ≤ 600\n\n입출력 예\nn = 1  →  result = [[1]]\nn = 2  →  result = [[1,2],[4,3]]\n\n입출력 예 설명\nn = 2: 오른쪽으로 1,2를 채우고 아래로 3, 왼쪽으로 4를 채웁니다.",
+  "statement_lang": "ko"
 }

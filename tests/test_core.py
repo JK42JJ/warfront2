@@ -615,3 +615,38 @@ def test_custom_content_merge(tmp_path, monkeypatch):
     from wf.engine.grader import grade
     k = loader.get_any("my-custom")
     assert grade(k.code, k.func, k.tests)["verdict"] == "pass"
+
+
+@pytest.mark.asyncio
+async def test_statement_two_column_layout(tmp_path, monkeypatch):
+    """지문 2컬럼 회귀(2026-07-21 James): 좌 지문 패널이 THINK 단계부터 보이고,
+    지문은 실전형 섹션(문제 설명/제한사항)을 담아야 하며, 우측 think 입력과 나란해야 한다."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.kata import KataScreen
+    from wf.screens.solve import SolveScreen
+    from wf.content.loader import get_kata
+
+    app = WarfrontApp()
+    async with app.run_test(size=(140, 50)) as pilot:
+        await pilot.press("enter")
+        await pilot.pause()
+        screen = app.screen
+        assert isinstance(screen, KataScreen)
+        stmt = screen.query_one("#stmt-panel")
+        rendered = str(stmt.render())
+        assert "문제 설명" in rendered or "Problem" in rendered
+        assert "제한사항" in rendered or "Constraints" in rendered
+        # 좌(지문)-우(입력) 나란히: 지문 패널 오른쪽 경계 <= 입력 박스 왼쪽 시작
+        think = screen.query_one("#think-box")
+        assert stmt.region.x < think.region.x
+        assert stmt.region.width > 20
+
+    app2 = WarfrontApp()
+    async with app2.run_test(size=(140, 50)) as pilot:
+        app2.push_screen(SolveScreen(get_kata("topk-counter"), "solve"))
+        await pilot.pause()
+        stmt = app2.screen.query_one("#stmt-panel")
+        rendered = str(stmt.render())
+        # 02_topk는 HackerRank 앵커 → 영문 지문
+        assert "Problem" in rendered and "Constraints" in rendered

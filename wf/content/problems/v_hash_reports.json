@@ -81,5 +81,7 @@
       "name": "HackerRank — Sherlock and Anagrams (해시)",
       "url": "https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\n게시판 이용자는 다른 이용자를 신고할 수 있습니다. 같은 사람을 여러 번 신고해도 1회로 처리됩니다. k번 이상 신고당한 이용자는 이용이 정지되며, 그 이용자를 신고했던 사람들에게 정지 사실 알림 메일이 발송됩니다.\n\n이용자 id 목록 id_list, \"신고자 피신고자\" 형식의 신고 기록 reports, 정지 기준 k가 주어질 때, 각 이용자가 받게 되는 알림 메일 수를 id_list 순서대로 담아 반환하도록 report_result 함수를 작성하세요.\n\n제한사항\n- 2 ≤ id_list의 길이 ≤ 1,000\n- 1 ≤ reports의 길이 ≤ 200,000 (자기 자신 신고는 없습니다)\n- 1 ≤ k ≤ 200\n\n입출력 예\nid_list = [\"muzi\",\"frodo\",\"apeach\",\"neo\"], k = 2\nreports = [\"muzi frodo\",\"apeach frodo\",\"frodo neo\",\"muzi neo\",\"apeach muzi\"]\nresult = [2, 1, 1, 0]\n\n입출력 예 설명\nfrodo와 neo가 2회 이상 신고당해 정지됩니다. muzi는 둘 다 신고했으므로 메일 2통을 받습니다.",
+  "statement_lang": "ko"
 }

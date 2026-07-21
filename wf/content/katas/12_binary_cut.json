@@ -118,5 +118,7 @@
       "name": "HackerRank — Minimum Time Required (파라메트릭)",
       "url": "https://www.hackerrank.com/challenges/minimum-time-required/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\n길이가 제각각인 랜선들이 있습니다. 이 랜선들을 잘라 같은 길이의 랜선 k개를 만들려 합니다. 랜선 하나에서 여러 개를 잘라낼 수 있지만, 자르고 남는 자투리는 버립니다. 만들 수 있는 랜선의 최대 길이(정수)를 구하려 합니다.\n\n랜선 길이 배열 cables와 k가 주어질 때, k개를 만들 수 있는 최대 길이를 반환하도록 max_length 함수를 작성하세요. 길이 1로도 k개를 만들 수 없으면 0을 반환합니다.\n\n제한사항\n- 1 ≤ cables의 길이 ≤ 100,000\n- 1 ≤ cables[i] ≤ 2³¹−1\n- 1 ≤ k ≤ 10⁹\n\n입출력 예\ncables = [802, 743, 457, 539], k = 11  →  result = 200\ncables = [5], k = 1                     →  result = 5\n\n입출력 예 설명\n예제 #1: 길이 200이면 4+3+2+2 = 11개를 만들 수 있고, 201 이상이면 11개가 안 됩니다.",
+  "statement_lang": "ko"
 }

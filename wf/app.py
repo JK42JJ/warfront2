@@ -30,8 +30,13 @@ class WarfrontApp(App):
        주의: Vertical/Horizontal 기본 height는 1fr(화면 채움) — auto로 강제하지
        않으면 빈 박스가 화면 전체를 먹고 다른 위젯을 화면 밖으로 밀어낸다
        (2026-07-20 화면깨짐 버그의 원인). */
-    #kata { padding: 1 4; height: auto; }
+    #kata { padding: 1 4; height: auto; width: 100%; }
     #kata-title { margin-bottom: 1; color: $accent; height: auto; }
+    /* 2컬럼: 좌 문제 지문 / 우 코드 — 실전 플랫폼과 동일한 배치 (2026-07-21 James) */
+    #twocol { height: auto; }
+    #stmt-panel { width: 46; height: auto; border: tall $secondary;
+                  border-title-color: $warning; padding: 1 2; margin-right: 2; }
+    #right-col { width: 1fr; height: auto; }
     #think-box { height: auto; border: tall $warning; padding: 1 2; margin: 1 0; }
     #think-prompt { height: auto; margin-bottom: 1; }
     #type-box { height: auto; margin-top: 1; }
@@ -43,7 +48,7 @@ class WarfrontApp(App):
     .hidden { display: none; }
 
     /* ---- 구현(solve) ---- */
-    #solve { padding: 1 4; height: auto; }
+    #solve { padding: 1 4; height: auto; width: 100%; }
     #solve-box { height: auto; }
     #solve-desc { height: auto; margin-bottom: 1; }
     #editor { height: 18; border: tall $primary; }

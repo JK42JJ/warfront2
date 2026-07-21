@@ -21,6 +21,8 @@ class Kata:
     think_model: str
     code: str
     desc: str = ""
+    statement: str = ""          # 실전형 문제 지문 (프로그래머스체 ko / HackerRank체 en)
+    statement_lang: str = "ko"   # ko | en — 앵커 플랫폼 언어를 따른다
     expected_complexity: str = ""
     subgoals: list[dict] = field(default_factory=list)
     line_notes: dict = field(default_factory=dict)

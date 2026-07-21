@@ -89,5 +89,7 @@
       "name": "LeetCode 1162 As Far from Land as Possible",
       "url": "https://leetcode.com/problems/as-far-from-land-as-possible/"
     }
-  ]
+  ],
+  "statement": "문제 설명\nn×m 바다 지도에서 1은 땅, 0은 바다입니다. 각 바다 칸에서 가장 가까운 땅까지의 거리(상하좌우 이동 횟수)를 잴 수 있습니다. 모든 바다 칸 중에서 이 거리가 가장 먼 칸을 찾아, 그 거리를 반환하려 합니다.\n\ngrid가 주어질 때 가장 외딴 바다 칸의 '가장 가까운 땅까지의 거리'를 반환하도록 farthest_sea 함수를 작성하세요. 땅이 하나도 없거나 바다가 하나도 없으면 -1을 반환합니다.\n\n제한사항\n- 1 ≤ n, m ≤ 400\n\n입출력 예\ngrid = [[1,0,1],[0,0,0],[1,0,1]]  →  result = 2\ngrid = [[1,0]]                    →  result = 1\n\n입출력 예 설명\n예제 #1: 정중앙 바다 칸은 어느 땅에서도 2칸 떨어져 있어 가장 외딴 곳입니다.",
+  "statement_lang": "ko"
 }

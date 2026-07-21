@@ -212,3 +212,10 @@ warfront2/
 M-R1: 스키마 signals·distractors + 기존 콘텐츠 22종에 시그널 작성
 M-R2: SolveScreen 판별 게이트(4지선다+근거) + recognition DB 기록
 M-R3: 인식 스피드 드릴 화면(지문 풀 회전) + 대시보드 인식률
+
+## 10. 실전형 지문 2컬럼 (2026-07-21, James 지시)
+
+문제 설명이 사실상 없던 화면("이건 좀 말이 안 된다")을 실전과 동일한 형태로 교정:
+- 모든 문항(카타 15 + 변형 7)에 **실전 출제 수준의 지문(statement)** 부여 — ko는 프로그래머스체(문제 설명/제한사항/입출력 예/설명), en은 HackerRank체(Problem/Constraints/Sample). 언어는 1순위 앵커 플랫폼을 따른다(statement_lang).
+- 화면 배치: **좌 지문 / 우 코드 2컬럼** — 카타(타이핑)·solve(백지 구현) 공통. 지문은 THINK 게이트 단계부터 보인다(지문을 읽고 생각을 선언하는 실전 순서).
+- 정합 원칙: 지문의 제한 수치는 perf.gen과, 예제는 tests와 일치(회귀 테스트 test_statement_two_column_layout).

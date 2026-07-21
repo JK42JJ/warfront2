@@ -19,7 +19,7 @@ from textual.widgets import Digits, Footer, Input, Static
 
 from wf.content.loader import Kata
 from wf.engine.typing_engine import TypingSession
-from wf.widgets import DiagramPanel
+from wf.widgets import DiagramPanel, statement_text
 from wf.store import db
 
 # 글자 상태 색 (타건감의 시각 언어)
@@ -71,20 +71,25 @@ class KataScreen(Screen):
         prompt = Text()
         prompt.append("🧠 THINK — ", style="bold yellow")
         prompt.append(self.kata.think_prompt)
+        stmt = Static(statement_text(self.kata), id="stmt-panel")
+        stmt.border_title = "문제" if self.kata.statement_lang != "en" else "Problem"
         with Vertical(id="kata"):
             yield Static(title, id="kata-title")
-            with Vertical(id="think-box"):
-                yield Static(prompt, id="think-prompt")
-                yield Input(placeholder="내 접근을 한 줄로 선언하고 Enter (연필로 그렸다면 요점만)", id="think-input")
-            with Vertical(id="type-box", classes="hidden"):
-                yield Static(id="code-display")
-                yield Static(id="hint-panel", classes="hidden")
-                yield DiagramPanel(id="diagram-panel", classes="hidden")
-                with Horizontal(id="stats"):
-                    yield Digits("0", id="wpm-digits")
-                    yield Static("타속 WPM", classes="stat-label")
-                    yield Digits("100", id="acc-digits")
-                    yield Static("정확도 %", classes="stat-label")
+            with Horizontal(id="twocol"):
+                yield stmt
+                with Vertical(id="right-col"):
+                    with Vertical(id="think-box"):
+                        yield Static(prompt, id="think-prompt")
+                        yield Input(placeholder="지문을 읽고 내 접근을 한 줄로 선언 후 Enter (연필로 그렸다면 요점만)", id="think-input")
+                    with Vertical(id="type-box", classes="hidden"):
+                        yield Static(id="code-display")
+                        yield Static(id="hint-panel", classes="hidden")
+                        yield DiagramPanel(id="diagram-panel", classes="hidden")
+                        with Horizontal(id="stats"):
+                            yield Digits("0", id="wpm-digits")
+                            yield Static("타속 WPM", classes="stat-label")
+                            yield Digits("100", id="acc-digits")
+                            yield Static("정확도 %", classes="stat-label")
         yield Footer()
 
     def on_mount(self) -> None:

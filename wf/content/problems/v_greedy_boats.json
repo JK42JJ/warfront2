@@ -67,5 +67,7 @@
       "name": "HackerRank — Max Min (그리디+정렬)",
       "url": "https://www.hackerrank.com/challenges/angry-children/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\n구명보트 한 대에는 최대 2명까지 탈 수 있고, 무게 합이 limit를 넘을 수 없습니다. 모든 사람을 구조하는 데 필요한 보트의 최소 개수를 구하려 합니다.\n\n사람들의 몸무게 배열 people과 limit가 주어질 때 최소 보트 수를 반환하도록 boats 함수를 작성하세요.\n\n제한사항\n- 1 ≤ people의 길이 ≤ 1,000,000\n- 40 ≤ people[i] ≤ 240\n- limit는 몸무게가 가장 큰 사람도 혼자는 탈 수 있도록 주어집니다.\n\n입출력 예\npeople = [70, 50, 80, 50], limit = 100  →  result = 3\npeople = [70, 80], limit = 100          →  result = 2\n\n입출력 예 설명\n예제 #1: (50,50)이 함께 타고, 70과 80은 각자 타므로 총 3대가 필요합니다.",
+  "statement_lang": "ko"
 }

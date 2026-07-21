@@ -125,5 +125,7 @@
       "name": "HackerRank — Triple Sum",
       "url": "https://www.hackerrank.com/challenges/triple-sum/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\n서로 다른 정수로 이루어진 배열 nums에서 두 수를 골라 더했을 때 target이 되는 쌍의 개수를 구하려 합니다. (i, j)와 (j, i)는 같은 쌍으로 한 번만 셉니다.\n\nnums와 target이 주어질 때 그런 쌍의 개수를 반환하도록 count_pairs 함수를 작성하세요.\n\n제한사항\n- 1 ≤ nums의 길이 ≤ 1,000,000\n- nums의 원소는 서로 다릅니다.\n- 정렬은 함수 안에서 직접 해야 합니다(입력은 정렬되어 있지 않을 수 있습니다).\n\n입출력 예\nnums = [5, 12, 7, 10, 9, 1, 2, 3, 11], target = 13  →  result = 3\nnums = [1, 2], target = 3                            →  result = 1\n\n입출력 예 설명\n예제 #1: (12,1), (10,3), (11,2) 세 쌍입니다.",
+  "statement_lang": "ko"
 }

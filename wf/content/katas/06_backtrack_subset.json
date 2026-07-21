@@ -116,5 +116,7 @@
       "name": "HackerRank — The Power Sum",
       "url": "https://www.hackerrank.com/challenges/the-power-sum/problem"
     }
-  ]
+  ],
+  "statement": "문제 설명\n자연수 배열 nums의 부분집합 중에서 원소의 합이 정확히 target이 되는 경우의 수를 세려 합니다. 배열에 같은 값이 여러 번 있어도 위치가 다르면 서로 다른 원소로 취급합니다(빈 부분집합은 세지 않습니다).\n\nnums와 target이 주어질 때, 합이 target인 부분집합의 개수를 반환하도록 count_subsets 함수를 작성하세요.\n\n제한사항\n- 1 ≤ nums의 길이 ≤ 18\n- 1 ≤ nums[i] ≤ 100\n- 1 ≤ target ≤ 2,000\n\n입출력 예\nnums = [1, 2, 3], target = 3  →  result = 2\nnums = [1, 1, 2], target = 2  →  result = 2\n\n입출력 예 설명\n예제 #1: {3}, {1,2}. 예제 #2: {2}, {첫 번째 1, 두 번째 1}.",
+  "statement_lang": "ko"
 }

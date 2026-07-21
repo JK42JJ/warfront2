@@ -15,13 +15,13 @@ from rich.text import Text
 from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Vertical
+from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Footer, Input, Static, TextArea
 
 from wf.content.loader import Kata
 from wf.store import db
-from wf.widgets import DiagramPanel
+from wf.widgets import DiagramPanel, statement_text
 
 MODE_KO = {"recall": "안 보고 재현", "solve": "스스로 구현"}
 
@@ -64,21 +64,24 @@ class SolveScreen(Screen):
         prompt.append("🧠 THINK — ", style="bold yellow")
         prompt.append(self.kata.think_prompt)
         desc = Text()
-        desc.append("과제: ", style="bold")
-        desc.append(self.kata.desc or self.kata.title)
-        desc.append("  (기능이 맞으면 pass — 변수명·구현 방식 자유. Ctrl+R 채점)", style="dim")
+        desc.append("기능이 맞으면 pass — 변수명·구현 방식 자유. Ctrl+R 채점", style="dim")
+        stmt = Static(statement_text(self.kata), id="stmt-panel")
+        stmt.border_title = "문제" if self.kata.statement_lang != "en" else "Problem"
         with Vertical(id="solve"):
             yield Static(title, id="kata-title")
-            with Vertical(id="think-box"):
-                yield Static(prompt, id="think-prompt")
-                yield Input(placeholder="내 접근을 한 줄로 선언하고 Enter", id="think-input")
-            with Vertical(id="solve-box", classes="hidden"):
-                yield Static(desc, id="solve-desc")
-                yield TextArea.code_editor(starter_code(self.kata),
-                                           language="python", id="editor")
-                yield Static(id="hint-panel", classes="hidden")
-                yield DiagramPanel(id="diagram-panel", classes="hidden")
-                yield Static(id="grade-panel", classes="hidden")
+            with Horizontal(id="twocol"):
+                yield stmt
+                with Vertical(id="right-col"):
+                    with Vertical(id="think-box"):
+                        yield Static(prompt, id="think-prompt")
+                        yield Input(placeholder="지문을 읽고 내 접근을 한 줄로 선언 후 Enter", id="think-input")
+                    with Vertical(id="solve-box", classes="hidden"):
+                        yield Static(desc, id="solve-desc")
+                        yield TextArea.code_editor(starter_code(self.kata),
+                                                   language="python", id="editor")
+                        yield Static(id="hint-panel", classes="hidden")
+                        yield DiagramPanel(id="diagram-panel", classes="hidden")
+                        yield Static(id="grade-panel", classes="hidden")
         yield Footer()
 
     def on_mount(self) -> None:

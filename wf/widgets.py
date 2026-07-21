@@ -96,3 +96,23 @@ class DiagramPanel(Static):
             for row in _hjoin(blocks):
                 text.append(row + "\n", style="grey66")
         self.update(text)
+
+
+# ---- 문제 지문 렌더 (2컬럼 좌측 패널 — 실전과 동일하게 지문을 읽고 푼다) ----
+_STMT_HEADERS = {
+    "문제 설명", "제한사항", "입출력 예", "입출력 예 설명",
+    "Problem", "Function Description", "Returns", "Constraints",
+    "Sample Input", "Sample Output", "Explanation",
+}
+
+
+def statement_text(kata) -> Text:
+    """지문을 섹션 헤더 강조와 함께 Rich Text로 렌더 (마크업 보간 금지 원칙 준수)."""
+    text = Text()
+    body = kata.statement or (kata.desc or kata.title)
+    for line in body.split("\n"):
+        if line.strip() in _STMT_HEADERS:
+            text.append(line + "\n", style="bold yellow")
+        else:
+            text.append(line + "\n")
+    return text
