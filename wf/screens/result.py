@@ -95,7 +95,7 @@ class ResultScreen(Screen):
 
     def action_home(self) -> None:
         from wf.screens.home import HomeScreen
-        self.app.switch_screen(HomeScreen())
+        self.app.switch_screen(HomeScreen(focus_kata=self.kata.id))
 
     def action_retry(self) -> None:
         from wf.screens.kata import KataScreen

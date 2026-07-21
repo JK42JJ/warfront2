@@ -210,4 +210,4 @@ class SolveScreen(Screen):
 
     def action_back(self) -> None:
         from wf.screens.home import HomeScreen
-        self.app.switch_screen(HomeScreen())
+        self.app.switch_screen(HomeScreen(focus_kata=self.record_as))

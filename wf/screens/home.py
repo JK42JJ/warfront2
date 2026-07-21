@@ -24,6 +24,7 @@ STAGE_EMOJI = ("👀", "🧩", "🧠", "⚔")                    # 아이콘은 
 
 
 class HomeScreen(Screen):
+    """focus_kata: 훈련을 마치고 돌아올 때 커서를 그 카타 행에 복원 (2026-07-21 버그픽스)."""
     BINDINGS = [
         ("g", "open_mode('guided')", "보고"),
         ("b", "open_mode('cloze')", "빈칸"),
@@ -33,6 +34,10 @@ class HomeScreen(Screen):
         ("t", "toggle_sprint", "속성 7일"),
         ("q", "quit_app", "종료"),
     ]
+
+    def __init__(self, focus_kata: str | None = None) -> None:
+        super().__init__()
+        self._focus_kata = focus_kata
 
     def compose(self) -> ComposeResult:
         import json as _json
@@ -188,7 +193,15 @@ class HomeScreen(Screen):
             self._update_row_detail(event.row_key.value)
 
     def on_mount(self) -> None:
-        self.query_one(DataTable).focus()
+        table = self.query_one(DataTable)
+        table.focus()
+        if self._focus_kata:
+            try:
+                idx = table.get_row_index(self._focus_kata)
+                table.move_cursor(row=idx)
+                self._update_row_detail(self._focus_kata)
+            except Exception:
+                pass  # 카타가 목록에 없으면(개인 콘텐츠 삭제 등) 첫 행 유지
         self._char_init()
 
     # ---------- 성장 캐릭터 (스트릭 5일마다 진화 — 보상·동기유발) ----------

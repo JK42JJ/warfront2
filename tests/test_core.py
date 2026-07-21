@@ -763,3 +763,19 @@ async def test_levelup_capture_flow(tmp_path, monkeypatch):
         for _ in range(8):
             await pilot.pause(0.5)
         assert captured and captured[0][0] == 1
+
+
+@pytest.mark.asyncio
+async def test_home_cursor_returns_to_trained_kata(tmp_path, monkeypatch):
+    """복귀 커서 복원(2026-07-21 버그): 훈련 후 홈 커서는 방금 수련한 카타 행에 있어야 한다."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "wf.db")
+    from wf.app import WarfrontApp
+    from wf.screens.home import HomeScreen
+    from textual.widgets import DataTable
+    app = WarfrontApp()
+    async with app.run_test(size=(150, 44)) as pilot:
+        app.push_screen(HomeScreen(focus_kata="bfs-grid"))
+        await pilot.pause()
+        table = app.screen.query_one(DataTable)
+        assert table.cursor_row == table.get_row_index("bfs-grid")
+        assert table.cursor_row != 0
