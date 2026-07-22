@@ -9,7 +9,7 @@
 
 터미널에서 하는 **파이썬(Python) 코딩테스트 훈련**. 하루 30분씩 50일, 급하면 7일 속성.
 
-![대시보드](docs/img/dashboard.svg)
+![대시보드](docs/img/shots/dashboard.png)
 
 ## 익숙한 문제, 다른 접근
 
@@ -66,7 +66,7 @@ flowchart TD
 - 치는 동안 글자마다 즉시 판정 — 맞으면 흰색, 틀리면 빨간색에서 정지
 - 막히면 `F1` 구조 힌트, `F2` 알고리즘이 움직이는 그림
 
-![따라치기](docs/img/kata.svg)
+![따라치기](docs/img/shots/kata.png)
 
 ### 유형 알아보기 — 인식 드릴 (`i`)
 
@@ -84,7 +84,7 @@ flowchart TD
 > 틀리는 순간이 학습 순간입니다 — 오답마다 판별 신호와 출처가 바로 표시됩니다.
 > **인식률 90%** 가 목표선입니다.
 
-![인식 드릴](docs/img/drill.svg)
+![인식 드릴](docs/img/shots/drill.png)
 
 ## 훈련이 캐릭터를 키운다
 
