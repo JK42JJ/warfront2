@@ -1,6 +1,13 @@
+<p align="center"><img src="docs/img/logo.png" alt="warfront2 — 터미널 파이썬 코딩테스트 훈련" width="820"></p>
+
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://github.com/Textualize/textual"><img src="https://img.shields.io/badge/TUI-Textual-5A56E0" alt="Textual TUI"></a>
+</p>
+
 # warfront2
 
-터미널에서 하는 코딩테스트 훈련. 하루 30분씩 50일, 급하면 7일 속성.
+터미널에서 하는 **파이썬(Python) 코딩테스트 훈련**. 하루 30분씩 50일, 급하면 7일 속성.
 
 ![대시보드](docs/img/dashboard.svg)
 
@@ -78,6 +85,13 @@ flowchart TD
 > **인식률 90%** 가 목표선입니다.
 
 ![인식 드릴](docs/img/drill.svg)
+
+## 훈련이 캐릭터를 키운다
+
+연속 훈련일 5일마다 수련 파트너가 진화합니다 — 알에서 전설의 검성까지 10단계.
+쉬면 멈추고, 이어가면 자랍니다. 대시보드에 상주하며 오늘의 훈련을 지켜봅니다.
+
+<p align="center"><img src="docs/img/growth.gif" alt="성장 캐릭터 — 알에서 전설의 검성까지 10단계 진화" width="460"></p>
 
 ## 패턴 구성
 
